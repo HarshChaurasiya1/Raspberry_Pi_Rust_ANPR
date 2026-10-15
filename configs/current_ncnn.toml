@@ -1,0 +1,34 @@
+﻿# Configuration 2: Current Detector + NCNN
+[detector]
+param_path = "models/current/detector_ncnn.param"
+bin_path = "models/current/detector_ncnn.bin"
+backend = "ncnn"
+input_size = 640
+confidence_threshold = 0.25
+nms_threshold = 0.45
+max_plates = 5
+crop_padding = 4
+threads = 3
+allow_spinning = false
+
+[recognizer]
+model_path = "models/current/recognizer.onnx"
+charset_path = "models/current/charset.txt"
+input_height = 48
+input_width = 320
+threads = 3
+allow_spinning = false
+grayscale = false
+
+[decoding]
+lambda_grammar = 1.0
+beam_width = 8
+nbest = 8
+num_variants = 3
+strict_grammar = false
+
+[runtime]
+threads = 3
+allow_spinning = false
+frame_skip = 1
+camera_resolution = [1280, 720]

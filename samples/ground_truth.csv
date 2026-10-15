@@ -1,0 +1,7 @@
+image,ground_truth,notes
+sample_0.jpg,,no plate visible (between vehicles)
+sample_1.jpg,HR10U2288,detected at conf 0.40 - Haryana plate
+sample_2.jpg,,no plate visible (between vehicles)
+sample_3.jpg,,plate barely visible - conf 0.11 only
+sample_4.jpg,,no plate visible (between vehicles)
+sample_5.jpg,,no plate visible (between vehicles)

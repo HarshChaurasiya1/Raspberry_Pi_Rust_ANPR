@@ -1,0 +1,44 @@
+﻿[package]
+name = "raspberry_pi_rust"
+version = "0.1.0"
+edition = "2021"
+authors = ["DeepMind ANPR Team"]
+description = "High-performance Grammar-Constrained ANPR for Raspberry Pi 5 in Rust"
+
+[lib]
+name = "raspberry_pi_rust"
+path = "src/lib.rs"
+
+[[bin]]
+name = "anpr"
+path = "src/main.rs"
+
+[dependencies]
+ort = { version = "2.0.0-rc.13", default-features = false, features = ["ndarray", "load-dynamic"] }
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "bmp", "rayon"] }
+imageproc = "0.25"
+ndarray = "0.15"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+clap = { version = "4.5", features = ["derive"] }
+csv = "1.3"
+anyhow = "1.0"
+thiserror = "2.0"
+log = "0.4"
+env_logger = "0.11"
+sysinfo = "0.33"
+chrono = "0.4"
+rayon = "1.10"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[profile.bench]
+opt-level = 3
+lto = "thin"
+codegen-units = 1

@@ -1,0 +1,16 @@
+[Unit]
+Description=High-Performance Rust ANPR Gate Service
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/Raspberry_Pi_Rust
+ExecStart=/home/pi/Raspberry_Pi_Rust/target/release/anpr --config configs/pi5_optimized.toml camera --log /var/log/anpr_plates.csv
+Restart=always
+RestartSec=3
+Environment=ANPR_THREADS=4
+Environment=ANPR_CONF=0.25
+
+[Install]
+WantedBy=multi-user.target

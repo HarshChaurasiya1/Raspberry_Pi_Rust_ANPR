@@ -1,0 +1,1093 @@
+7767517
+1091 1477
+Input                    in0                      0 1 in0
+DynamicQuantizeLinear    DynamicQuantizeLinear_0  1 3 in0 1 2 3
+MemoryData               model.0.conv.weight_quantized 0 1 4 0=3 1=3 11=3 2=32
+pnnx.Expression          pnnx_expr_627            0 1 5
+Split                    splitncnn_0              1 102 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107
+ConvInteger              ConvInteger_2            4 1 1 4 3 6 108
+Tensor.to                Tensor.to_1              1 1 108 109
+MemoryData               /model.0/conv/Conv_output_0_bias_reshape_output 0 1 110 0=1 1=1 2=32
+BinaryOp                 mul_0                    1 1 2 111 0=2 1=1 2=1.24732399
+BinaryOp                 mul_1                    2 1 109 111 112 0=2
+BinaryOp                 add_2                    2 1 112 110 113 0=0
+Swish                    silu_20                  1 1 113 114
+DynamicQuantizeLinear    DynamicQuantizeLinear_8  1 3 114 115 116 117
+MemoryData               model.1.conv.weight_quantized 0 1 118 0=3 1=3 11=32 2=64
+ConvInteger              ConvInteger_10           4 1 115 118 117 7 119
+Tensor.to                Tensor.to_2              1 1 119 120
+MemoryData               /model.1/conv/Conv_output_0_bias_reshape_output 0 1 121 0=1 1=1 2=64
+BinaryOp                 mul_3                    1 1 116 122 0=2 1=1 2=1.06847268e-2
+BinaryOp                 mul_4                    2 1 120 122 123 0=2
+BinaryOp                 add_5                    2 1 123 121 124 0=0
+Swish                    silu_21                  1 1 124 125
+DynamicQuantizeLinear    DynamicQuantizeLinear_16 1 3 125 126 127 128
+MemoryData               model.2.cv1.conv.weight_quantized 0 1 129 0=1 1=1 11=64 2=64
+ConvInteger              ConvInteger_18           4 1 126 129 128 8 130
+Tensor.to                Tensor.to_3              1 1 130 131
+MemoryData               /model.2/cv1/conv/Conv_output_0_bias_reshape_output 0 1 132 0=1 1=1 2=64
+BinaryOp                 mul_6                    1 1 127 133 0=2 1=1 2=7.38059077e-3
+BinaryOp                 mul_7                    2 1 131 133 134 0=2
+BinaryOp                 add_8                    2 1 134 132 135 0=0
+Swish                    silu_22                  1 1 135 136
+Slice                    split_0                  1 2 136 137 138 -23300=2,32,32 1=0
+Split                    splitncnn_1              1 3 138 139 140 141
+DynamicQuantizeLinear    DynamicQuantizeLinear_25 1 3 139 142 143 144
+MemoryData               model.2.m.0.cv1.conv.weight_quantized 0 1 145 0=3 1=3 11=32 2=16
+ConvInteger              ConvInteger_27           4 1 142 145 144 9 146
+Tensor.to                Tensor.to_4              1 1 146 147
+MemoryData               /model.2/m.0/cv1/conv/Conv_output_0_bias_reshape_output 0 1 148 0=1 1=1 2=16
+BinaryOp                 mul_9                    1 1 143 149 0=2 1=1 2=2.98075587e-3
+BinaryOp                 mul_10                   2 1 147 149 150 0=2
+BinaryOp                 add_11                   2 1 150 148 151 0=0
+Swish                    silu_23                  1 1 151 152
+DynamicQuantizeLinear    DynamicQuantizeLinear_33 1 3 152 153 154 155
+MemoryData               model.2.m.0.cv2.conv.weight_quantized 0 1 156 0=3 1=3 11=16 2=32
+ConvInteger              ConvInteger_35           4 1 153 156 155 10 157
+Tensor.to                Tensor.to_5              1 1 157 158
+MemoryData               /model.2/m.0/cv2/conv/Conv_output_0_bias_reshape_output 0 1 159 0=1 1=1 2=32
+BinaryOp                 mul_12                   1 1 154 160 0=2 1=1 2=2.59570107e-2
+BinaryOp                 mul_13                   2 1 158 160 161 0=2
+BinaryOp                 add_14                   2 1 161 159 162 0=0
+Split                    splitncnn_2              1 2 162 163 164
+Sigmoid                  sigmoid_5                1 1 164 165
+BinaryOp                 mul_15                   2 1 163 165 166 0=2
+BinaryOp                 add_16                   2 1 141 166 167 0=0
+Concat                   cat_0                    3 1 137 140 167 168 0=0
+DynamicQuantizeLinear    DynamicQuantizeLinear_43 1 3 168 169 170 171
+MemoryData               model.2.cv2.conv.weight_quantized 0 1 172 0=1 1=1 11=96 2=128
+ConvInteger              ConvInteger_45           4 1 169 172 171 11 173
+Tensor.to                Tensor.to_6              1 1 173 174
+MemoryData               /model.2/cv2/conv/Conv_output_0_bias_reshape_output 0 1 175 0=1 1=1 2=128
+BinaryOp                 mul_17                   1 1 170 176 0=2 1=1 2=7.71727087e-3
+BinaryOp                 mul_18                   2 1 174 176 177 0=2
+BinaryOp                 add_19                   2 1 177 175 178 0=0
+Swish                    silu_24                  1 1 178 179
+DynamicQuantizeLinear    DynamicQuantizeLinear_51 1 3 179 180 181 182
+MemoryData               model.3.conv.weight_quantized 0 1 183 0=3 1=3 11=128 2=128
+ConvInteger              ConvInteger_53           4 1 180 183 182 12 184
+Tensor.to                Tensor.to_7              1 1 184 185
+MemoryData               /model.3/conv/Conv_output_0_bias_reshape_output 0 1 186 0=1 1=1 2=128
+BinaryOp                 mul_20                   1 1 181 187 0=2 1=1 2=2.44408287e-3
+BinaryOp                 mul_21                   2 1 185 187 188 0=2
+BinaryOp                 add_22                   2 1 188 186 189 0=0
+Swish                    silu_25                  1 1 189 190
+DynamicQuantizeLinear    DynamicQuantizeLinear_59 1 3 190 191 192 193
+MemoryData               model.4.cv1.conv.weight_quantized 0 1 194 0=1 1=1 11=128 2=128
+ConvInteger              ConvInteger_61           4 1 191 194 193 13 195
+Tensor.to                Tensor.to_8              1 1 195 196
+MemoryData               /model.4/cv1/conv/Conv_output_0_bias_reshape_output 0 1 197 0=1 1=1 2=128
+BinaryOp                 mul_23                   1 1 192 198 0=2 1=1 2=1.22737885e-2
+BinaryOp                 mul_24                   2 1 196 198 199 0=2
+BinaryOp                 add_25                   2 1 199 197 200 0=0
+Swish                    silu_26                  1 1 200 201
+Slice                    split_1                  1 2 201 202 203 -23300=2,64,64 1=0
+Split                    splitncnn_3              1 3 203 204 205 206
+DynamicQuantizeLinear    DynamicQuantizeLinear_68 1 3 204 207 208 209
+MemoryData               model.4.m.0.cv1.conv.weight_quantized 0 1 210 0=3 1=3 11=64 2=32
+ConvInteger              ConvInteger_70           4 1 207 210 209 14 211
+Tensor.to                Tensor.to_9              1 1 211 212
+MemoryData               /model.4/m.0/cv1/conv/Conv_output_0_bias_reshape_output 0 1 213 0=1 1=1 2=32
+BinaryOp                 mul_26                   1 1 208 214 0=2 1=1 2=4.20066901e-3
+BinaryOp                 mul_27                   2 1 212 214 215 0=2
+BinaryOp                 add_28                   2 1 215 213 216 0=0
+Swish                    silu_27                  1 1 216 217
+DynamicQuantizeLinear    DynamicQuantizeLinear_76 1 3 217 218 219 220
+MemoryData               model.4.m.0.cv2.conv.weight_quantized 0 1 221 0=3 1=3 11=32 2=64
+ConvInteger              ConvInteger_78           4 1 218 221 220 15 222
+Tensor.to                Tensor.to_10             1 1 222 223
+MemoryData               /model.4/m.0/cv2/conv/Conv_output_0_bias_reshape_output 0 1 224 0=1 1=1 2=64
+BinaryOp                 mul_29                   1 1 219 225 0=2 1=1 2=9.24930163e-3
+BinaryOp                 mul_30                   2 1 223 225 226 0=2
+BinaryOp                 add_31                   2 1 226 224 227 0=0
+Split                    splitncnn_4              1 2 227 228 229
+Sigmoid                  sigmoid_6                1 1 229 230
+BinaryOp                 mul_32                   2 1 228 230 231 0=2
+BinaryOp                 add_33                   2 1 206 231 232 0=0
+Concat                   cat_1                    3 1 202 205 232 233 0=0
+DynamicQuantizeLinear    DynamicQuantizeLinear_86 1 3 233 234 235 236
+MemoryData               model.4.cv2.conv.weight_quantized 0 1 237 0=1 1=1 11=192 2=256
+ConvInteger              ConvInteger_88           4 1 234 237 236 16 238
+Tensor.to                Tensor.to_11             1 1 238 239
+MemoryData               /model.4/cv2/conv/Conv_output_0_bias_reshape_output 0 1 240 0=1 1=1 2=256
+BinaryOp                 mul_34                   1 1 235 241 0=2 1=1 2=8.16321839e-3
+BinaryOp                 mul_35                   2 1 239 241 242 0=2
+BinaryOp                 add_36                   2 1 242 240 243 0=0
+Swish                    silu_28                  1 1 243 244
+Split                    splitncnn_5              1 2 244 245 246
+DynamicQuantizeLinear    DynamicQuantizeLinear_94 1 3 245 247 248 249
+MemoryData               model.5.conv.weight_quantized 0 1 250 0=3 1=3 11=256 2=256
+ConvInteger              ConvInteger_96           4 1 247 250 249 17 251
+Tensor.to                Tensor.to_12             1 1 251 252
+MemoryData               /model.5/conv/Conv_output_0_bias_reshape_output 0 1 253 0=1 1=1 2=256
+BinaryOp                 mul_37                   1 1 248 254 0=2 1=1 2=3.94639559e-3
+BinaryOp                 mul_38                   2 1 252 254 255 0=2
+BinaryOp                 add_39                   2 1 255 253 256 0=0
+Swish                    silu_29                  1 1 256 257
+DynamicQuantizeLinear    DynamicQuantizeLinear_102 1 3 257 258 259 260
+MemoryData               model.6.cv1.conv.weight_quantized 0 1 261 0=1 1=1 11=256 2=256
+ConvInteger              ConvInteger_104          4 1 258 261 260 18 262
+Tensor.to                Tensor.to_13             1 1 262 263
+MemoryData               /model.6/cv1/conv/Conv_output_0_bias_reshape_output 0 1 264 0=1 1=1 2=256
+BinaryOp                 mul_40                   1 1 259 265 0=2 1=1 2=9.24071763e-3
+BinaryOp                 mul_41                   2 1 263 265 266 0=2
+BinaryOp                 add_42                   2 1 266 264 267 0=0
+Swish                    silu_30                  1 1 267 268
+Slice                    split_2                  1 2 268 269 270 -23300=2,128,128 1=0
+Split                    splitncnn_6              1 2 270 271 272
+DynamicQuantizeLinear    DynamicQuantizeLinear_111 1 3 271 273 274 275
+Split                    splitncnn_9              1 2 275 276 277
+Split                    splitncnn_8              1 2 274 278 279
+Split                    splitncnn_7              1 2 273 280 281
+MemoryData               model.6.m.0.cv1.conv.weight_quantized 0 1 282 0=1 1=1 11=128 2=64
+ConvInteger              ConvInteger_114          4 1 280 282 276 19 283
+MemoryData               model.6.m.0.cv2.conv.weight_quantized 0 1 284 0=1 1=1 11=128 2=64
+ConvInteger              ConvInteger_115          4 1 281 284 277 20 285
+Tensor.to                Tensor.to_14             1 1 283 286
+Tensor.to                Tensor.to_15             1 1 285 287
+MemoryData               /model.6/m.0/cv1/conv/Conv_output_0_bias_reshape_output 0 1 288 0=1 1=1 2=64
+BinaryOp                 mul_43                   1 1 278 289 0=2 1=1 2=6.19409140e-3
+BinaryOp                 mul_44                   2 1 286 289 290 0=2
+BinaryOp                 add_45                   2 1 290 288 291 0=0
+MemoryData               /model.6/m.0/cv2/conv/Conv_output_0_bias_reshape_output 0 1 292 0=1 1=1 2=64
+BinaryOp                 mul_46                   1 1 279 293 0=2 1=1 2=1.13164252e-2
+BinaryOp                 mul_47                   2 1 287 293 294 0=2
+BinaryOp                 add_48                   2 1 294 292 295 0=0
+Swish                    silu_31                  1 1 291 296
+Split                    splitncnn_10             1 2 296 297 298
+Swish                    silu_32                  1 1 295 299
+DynamicQuantizeLinear    DynamicQuantizeLinear_126 1 3 297 300 301 302
+MemoryData               model.6.m.0.m.0.cv1.conv.weight_quantized 0 1 303 0=3 1=3 11=64 2=64
+ConvInteger              ConvInteger_128          4 1 300 303 302 21 304
+Tensor.to                Tensor.to_16             1 1 304 305
+MemoryData               /model.6/m.0/m/m.0/cv1/conv/Conv_output_0_bias_reshape_output 0 1 306 0=1 1=1 2=64
+BinaryOp                 mul_49                   1 1 301 307 0=2 1=1 2=8.53096787e-3
+BinaryOp                 mul_50                   2 1 305 307 308 0=2
+BinaryOp                 add_51                   2 1 308 306 309 0=0
+Swish                    silu_33                  1 1 309 310
+DynamicQuantizeLinear    DynamicQuantizeLinear_134 1 3 310 311 312 313
+MemoryData               model.6.m.0.m.0.cv2.conv.weight_quantized 0 1 314 0=3 1=3 11=64 2=64
+ConvInteger              ConvInteger_136          4 1 311 314 313 22 315
+Tensor.to                Tensor.to_17             1 1 315 316
+MemoryData               /model.6/m.0/m/m.0/cv2/conv/Conv_output_0_bias_reshape_output 0 1 317 0=1 1=1 2=64
+BinaryOp                 mul_52                   1 1 312 318 0=2 1=1 2=5.05516445e-3
+BinaryOp                 mul_53                   2 1 316 318 319 0=2
+BinaryOp                 add_54                   2 1 319 317 320 0=0
+Split                    splitncnn_11             1 2 320 321 322
+Sigmoid                  sigmoid_7                1 1 322 323
+BinaryOp                 mul_55                   2 1 321 323 324 0=2
+BinaryOp                 add_56                   2 1 298 324 325 0=0
+Split                    splitncnn_12             1 2 325 326 327
+DynamicQuantizeLinear    DynamicQuantizeLinear_143 1 3 326 328 329 330
+MemoryData               model.6.m.0.m.1.cv1.conv.weight_quantized 0 1 331 0=3 1=3 11=64 2=64
+ConvInteger              ConvInteger_145          4 1 328 331 330 23 332
+Tensor.to                Tensor.to_18             1 1 332 333
+MemoryData               /model.6/m.0/m/m.1/cv1/conv/Conv_output_0_bias_reshape_output 0 1 334 0=1 1=1 2=64
+BinaryOp                 mul_57                   1 1 329 335 0=2 1=1 2=3.75307468e-3
+BinaryOp                 mul_58                   2 1 333 335 336 0=2
+BinaryOp                 add_59                   2 1 336 334 337 0=0
+Swish                    silu_34                  1 1 337 338
+DynamicQuantizeLinear    DynamicQuantizeLinear_151 1 3 338 339 340 341
+MemoryData               model.6.m.0.m.1.cv2.conv.weight_quantized 0 1 342 0=3 1=3 11=64 2=64
+ConvInteger              ConvInteger_153          4 1 339 342 341 24 343
+Tensor.to                Tensor.to_19             1 1 343 344
+MemoryData               /model.6/m.0/m/m.1/cv2/conv/Conv_output_0_bias_reshape_output 0 1 345 0=1 1=1 2=64
+BinaryOp                 mul_60                   1 1 340 346 0=2 1=1 2=6.02323888e-3
+BinaryOp                 mul_61                   2 1 344 346 347 0=2
+BinaryOp                 add_62                   2 1 347 345 348 0=0
+Split                    splitncnn_13             1 2 348 349 350
+Sigmoid                  sigmoid_8                1 1 350 351
+BinaryOp                 mul_63                   2 1 349 351 352 0=2
+BinaryOp                 add_64                   2 1 327 352 353 0=0
+Concat                   cat_2                    2 1 353 299 354 0=0
+DynamicQuantizeLinear    DynamicQuantizeLinear_161 1 3 354 355 356 357
+MemoryData               model.6.m.0.cv3.conv.weight_quantized 0 1 358 0=1 1=1 11=128 2=128
+ConvInteger              ConvInteger_163          4 1 355 358 357 25 359
+Tensor.to                Tensor.to_20             1 1 359 360
+MemoryData               /model.6/m.0/cv3/conv/Conv_output_0_bias_reshape_output 0 1 361 0=1 1=1 2=128
+BinaryOp                 mul_65                   1 1 356 362 0=2 1=1 2=6.03234908e-3
+BinaryOp                 mul_66                   2 1 360 362 363 0=2
+BinaryOp                 add_67                   2 1 363 361 364 0=0
+Swish                    silu_35                  1 1 364 365
+Concat                   cat_3                    3 1 269 272 365 366 0=0
+DynamicQuantizeLinear    DynamicQuantizeLinear_170 1 3 366 367 368 369
+MemoryData               model.6.cv2.conv.weight_quantized 0 1 370 0=1 1=1 11=384 2=256
+ConvInteger              ConvInteger_172          4 1 367 370 369 26 371
+Tensor.to                Tensor.to_21             1 1 371 372
+MemoryData               /model.6/cv2/conv/Conv_output_0_bias_reshape_output 0 1 373 0=1 1=1 2=256
+BinaryOp                 mul_68                   1 1 368 374 0=2 1=1 2=5.25475852e-3
+BinaryOp                 mul_69                   2 1 372 374 375 0=2
+BinaryOp                 add_70                   2 1 375 373 376 0=0
+Swish                    silu_36                  1 1 376 377
+Split                    splitncnn_14             1 2 377 378 379
+DynamicQuantizeLinear    DynamicQuantizeLinear_178 1 3 378 380 381 382
+MemoryData               model.7.conv.weight_quantized 0 1 383 0=3 1=3 11=256 2=512
+ConvInteger              ConvInteger_180          4 1 380 383 382 27 384
+Tensor.to                Tensor.to_22             1 1 384 385
+MemoryData               /model.7/conv/Conv_output_0_bias_reshape_output 0 1 386 0=1 1=1 2=512
+BinaryOp                 mul_71                   1 1 381 387 0=2 1=1 2=4.29110741e-3
+BinaryOp                 mul_72                   2 1 385 387 388 0=2
+BinaryOp                 add_73                   2 1 388 386 389 0=0
+Swish                    silu_37                  1 1 389 390
+DynamicQuantizeLinear    DynamicQuantizeLinear_186 1 3 390 391 392 393
+MemoryData               model.8.cv1.conv.weight_quantized 0 1 394 0=1 1=1 11=512 2=512
+ConvInteger              ConvInteger_188          4 1 391 394 393 28 395
+Tensor.to                Tensor.to_23             1 1 395 396
+MemoryData               /model.8/cv1/conv/Conv_output_0_bias_reshape_output 0 1 397 0=1 1=1 2=512
+BinaryOp                 mul_74                   1 1 392 398 0=2 1=1 2=6.48357067e-3
+BinaryOp                 mul_75                   2 1 396 398 399 0=2
+BinaryOp                 add_76                   2 1 399 397 400 0=0
+Swish                    silu_38                  1 1 400 401
+Slice                    split_3                  1 2 401 402 403 -23300=2,256,256 1=0
+Split                    splitncnn_15             1 2 403 404 405
+DynamicQuantizeLinear    DynamicQuantizeLinear_195 1 3 404 406 407 408
+Split                    splitncnn_18             1 2 408 409 410
+Split                    splitncnn_17             1 2 407 411 412
+Split                    splitncnn_16             1 2 406 413 414
+MemoryData               model.8.m.0.cv1.conv.weight_quantized 0 1 415 0=1 1=1 11=256 2=128
+ConvInteger              ConvInteger_198          4 1 413 415 409 29 416
+MemoryData               model.8.m.0.cv2.conv.weight_quantized 0 1 417 0=1 1=1 11=256 2=128
+ConvInteger              ConvInteger_199          4 1 414 417 410 30 418
+Tensor.to                Tensor.to_24             1 1 416 419
+Tensor.to                Tensor.to_25             1 1 418 420
+MemoryData               /model.8/m.0/cv1/conv/Conv_output_0_bias_reshape_output 0 1 421 0=1 1=1 2=128
+BinaryOp                 mul_77                   1 1 411 422 0=2 1=1 2=6.62882859e-3
+BinaryOp                 mul_78                   2 1 419 422 423 0=2
+BinaryOp                 add_79                   2 1 423 421 424 0=0
+MemoryData               /model.8/m.0/cv2/conv/Conv_output_0_bias_reshape_output 0 1 425 0=1 1=1 2=128
+BinaryOp                 mul_80                   1 1 412 426 0=2 1=1 2=8.30830168e-3
+BinaryOp                 mul_81                   2 1 420 426 427 0=2
+BinaryOp                 add_82                   2 1 427 425 428 0=0
+Swish                    silu_39                  1 1 424 429
+Split                    splitncnn_19             1 2 429 430 431
+Swish                    silu_40                  1 1 428 432
+DynamicQuantizeLinear    DynamicQuantizeLinear_210 1 3 430 433 434 435
+MemoryData               model.8.m.0.m.0.cv1.conv.weight_quantized 0 1 436 0=3 1=3 11=128 2=128
+ConvInteger              ConvInteger_212          4 1 433 436 435 31 437
+Tensor.to                Tensor.to_26             1 1 437 438
+MemoryData               /model.8/m.0/m/m.0/cv1/conv/Conv_output_0_bias_reshape_output 0 1 439 0=1 1=1 2=128
+BinaryOp                 mul_83                   1 1 434 440 0=2 1=1 2=7.11644301e-3
+BinaryOp                 mul_84                   2 1 438 440 441 0=2
+BinaryOp                 add_85                   2 1 441 439 442 0=0
+Swish                    silu_41                  1 1 442 443
+DynamicQuantizeLinear    DynamicQuantizeLinear_218 1 3 443 444 445 446
+MemoryData               model.8.m.0.m.0.cv2.conv.weight_quantized 0 1 447 0=3 1=3 11=128 2=128
+ConvInteger              ConvInteger_220          4 1 444 447 446 32 448
+Tensor.to                Tensor.to_27             1 1 448 449
+MemoryData               /model.8/m.0/m/m.0/cv2/conv/Conv_output_0_bias_reshape_output 0 1 450 0=1 1=1 2=128
+BinaryOp                 mul_86                   1 1 445 451 0=2 1=1 2=4.17697756e-3
+BinaryOp                 mul_87                   2 1 449 451 452 0=2
+BinaryOp                 add_88                   2 1 452 450 453 0=0
+Split                    splitncnn_20             1 2 453 454 455
+Sigmoid                  sigmoid_9                1 1 455 456
+BinaryOp                 mul_89                   2 1 454 456 457 0=2
+BinaryOp                 add_90                   2 1 431 457 458 0=0
+Split                    splitncnn_21             1 2 458 459 460
+DynamicQuantizeLinear    DynamicQuantizeLinear_227 1 3 459 461 462 463
+MemoryData               model.8.m.0.m.1.cv1.conv.weight_quantized 0 1 464 0=3 1=3 11=128 2=128
+ConvInteger              ConvInteger_229          4 1 461 464 463 33 465
+Tensor.to                Tensor.to_28             1 1 465 466
+MemoryData               /model.8/m.0/m/m.1/cv1/conv/Conv_output_0_bias_reshape_output 0 1 467 0=1 1=1 2=128
+BinaryOp                 mul_91                   1 1 462 468 0=2 1=1 2=2.67814682e-3
+BinaryOp                 mul_92                   2 1 466 468 469 0=2
+BinaryOp                 add_93                   2 1 469 467 470 0=0
+Swish                    silu_42                  1 1 470 471
+DynamicQuantizeLinear    DynamicQuantizeLinear_235 1 3 471 472 473 474
+MemoryData               model.8.m.0.m.1.cv2.conv.weight_quantized 0 1 475 0=3 1=3 11=128 2=128
+ConvInteger              ConvInteger_237          4 1 472 475 474 34 476
+Tensor.to                Tensor.to_29             1 1 476 477
+MemoryData               /model.8/m.0/m/m.1/cv2/conv/Conv_output_0_bias_reshape_output 0 1 478 0=1 1=1 2=128
+BinaryOp                 mul_94                   1 1 473 479 0=2 1=1 2=6.15426479e-3
+BinaryOp                 mul_95                   2 1 477 479 480 0=2
+BinaryOp                 add_96                   2 1 480 478 481 0=0
+Split                    splitncnn_22             1 2 481 482 483
+Sigmoid                  sigmoid_10               1 1 483 484
+BinaryOp                 mul_97                   2 1 482 484 485 0=2
+BinaryOp                 add_98                   2 1 460 485 486 0=0
+Concat                   cat_4                    2 1 486 432 487 0=0
+DynamicQuantizeLinear    DynamicQuantizeLinear_245 1 3 487 488 489 490
+MemoryData               model.8.m.0.cv3.conv.weight_quantized 0 1 491 0=1 1=1 11=256 2=256
+ConvInteger              ConvInteger_247          4 1 488 491 490 35 492
+Tensor.to                Tensor.to_30             1 1 492 493
+MemoryData               /model.8/m.0/cv3/conv/Conv_output_0_bias_reshape_output 0 1 494 0=1 1=1 2=256
+BinaryOp                 mul_99                   1 1 489 495 0=2 1=1 2=3.93703673e-3
+BinaryOp                 mul_100                  2 1 493 495 496 0=2
+BinaryOp                 add_101                  2 1 496 494 497 0=0
+Swish                    silu_43                  1 1 497 498
+Concat                   cat_5                    3 1 402 405 498 499 0=0
+DynamicQuantizeLinear    DynamicQuantizeLinear_254 1 3 499 500 501 502
+MemoryData               model.8.cv2.conv.weight_quantized 0 1 503 0=1 1=1 11=768 2=512
+ConvInteger              ConvInteger_256          4 1 500 503 502 36 504
+Tensor.to                Tensor.to_31             1 1 504 505
+MemoryData               /model.8/cv2/conv/Conv_output_0_bias_reshape_output 0 1 506 0=1 1=1 2=512
+BinaryOp                 mul_102                  1 1 501 507 0=2 1=1 2=0.00804968
+BinaryOp                 mul_103                  2 1 505 507 508 0=2
+BinaryOp                 add_104                  2 1 508 506 509 0=0
+Swish                    silu_44                  1 1 509 510
+Split                    splitncnn_23             1 2 510 511 512
+DynamicQuantizeLinear    DynamicQuantizeLinear_262 1 3 511 513 514 515
+MemoryData               model.9.cv1.conv.weight_quantized 0 1 516 0=1 1=1 11=512 2=256
+ConvInteger              ConvInteger_264          4 1 513 516 515 37 517
+Tensor.to                Tensor.to_32             1 1 517 518
+MemoryData               /model.9/cv1/conv/Conv_output_0_bias_reshape_output 0 1 519 0=1 1=1 2=256
+BinaryOp                 mul_105                  1 1 514 520 0=2 1=1 2=8.46345071e-3
+BinaryOp                 mul_106                  2 1 518 520 521 0=2
+BinaryOp                 add_107                  2 1 521 519 522 0=0
+Split                    splitncnn_24             1 2 522 523 524
+Pooling                  maxpool2d_2              1 1 524 525 0=0 1=5 11=5 12=1 13=2 2=1 3=2 5=1
+Split                    splitncnn_25             1 2 525 526 527
+Pooling                  maxpool2d_3              1 1 527 528 0=0 1=5 11=5 12=1 13=2 2=1 3=2 5=1
+Split                    splitncnn_26             1 2 528 529 530
+Pooling                  maxpool2d_4              1 1 530 531 0=0 1=5 11=5 12=1 13=2 2=1 3=2 5=1
+Concat                   cat_6                    4 1 523 526 529 531 532 0=0
+DynamicQuantizeLinear    DynamicQuantizeLinear_272 1 3 532 533 534 535
+MemoryData               model.9.cv2.conv.weight_quantized 0 1 536 0=1 1=1 11=1024 2=512
+ConvInteger              ConvInteger_274          4 1 533 536 535 38 537
+Tensor.to                Tensor.to_33             1 1 537 538
+MemoryData               /model.9/cv2/conv/Conv_output_0_bias_reshape_output 0 1 539 0=1 1=1 2=512
+BinaryOp                 mul_108                  1 1 534 540 0=2 1=1 2=4.66909213e-3
+BinaryOp                 mul_109                  2 1 538 540 541 0=2
+BinaryOp                 add_110                  2 1 541 539 542 0=0
+Split                    splitncnn_27             1 2 542 543 544
+Sigmoid                  sigmoid_11               1 1 544 545
+BinaryOp                 mul_111                  2 1 543 545 546 0=2
+BinaryOp                 add_112                  2 1 546 512 547 0=0
+DynamicQuantizeLinear    DynamicQuantizeLinear_281 1 3 547 548 549 550
+MemoryData               model.10.cv1.conv.weight_quantized 0 1 551 0=1 1=1 11=512 2=512
+ConvInteger              ConvInteger_283          4 1 548 551 550 39 552
+Tensor.to                Tensor.to_34             1 1 552 553
+MemoryData               /model.10/cv1/conv/Conv_output_0_bias_reshape_output 0 1 554 0=1 1=1 2=512
+BinaryOp                 mul_113                  1 1 549 555 0=2 1=1 2=6.85191108e-3
+BinaryOp                 mul_114                  2 1 553 555 556 0=2
+BinaryOp                 add_115                  2 1 556 554 557 0=0
+Swish                    silu_45                  1 1 557 558
+Slice                    split_4                  1 2 558 559 560 -23300=2,256,256 1=0
+Split                    splitncnn_28             1 2 560 561 562
+DynamicQuantizeLinear    DynamicQuantizeLinear_290 1 3 561 563 564 565
+MemoryData               model.10.m.0.attn.qkv.conv.weight_quantized 0 1 566 0=1 1=1 11=256 2=512
+ConvInteger              ConvInteger_292          4 1 563 566 565 40 567
+Tensor.to                Tensor.to_35             1 1 567 568
+MemoryData               /model.10/m/m.0/attn/qkv/conv/Conv_output_0_bias_reshape_output 0 1 569 0=1 1=1 2=512
+BinaryOp                 mul_116                  1 1 564 570 0=2 1=1 2=1.05787953e-2
+BinaryOp                 mul_117                  2 1 568 570 571 0=2
+BinaryOp                 add_118                  2 1 571 569 572 0=0
+Reshape                  reshape_100              1 1 572 573 0=400 1=128 2=4
+Slice                    split_5                  1 3 573 574 575 576 -23300=3,32,32,64 1=1
+Split                    splitncnn_29             1 2 576 577 578
+Permute                  permute_95               1 1 574 579 0=1
+Reshape                  reshape_101              1 1 577 580 0=20 1=20 2=256
+MatMul                   matmul_114               2 1 579 575 581
+DynamicQuantizeLinear    DynamicQuantizeLinear_301 1 3 580 582 583 584
+BinaryOp                 mul_119                  1 1 581 585 0=2 1=1 2=0.176776692
+MemoryData               model.10.m.0.attn.pe.conv.weight_quantized 0 1 586 0=3 1=3 11=1 2=256
+ConvInteger              ConvInteger_304          4 1 582 586 584 41 587
+Softmax                  softmax_93               1 1 585 588 0=2 1=1
+Tensor.to                Tensor.to_36             1 1 587 589
+MatMul                   matmultransb_0           2 1 578 588 590 0=1
+MemoryData               /model.10/m/m.0/attn/pe/conv/Conv_output_0_bias_reshape_output 0 1 591 0=1 1=1 2=256
+Reshape                  reshape_102              1 1 590 592 0=20 1=20 2=256
+BinaryOp                 mul_120                  1 1 583 593 0=2 1=1 2=1.33856982e-2
+BinaryOp                 mul_121                  2 1 589 593 594 0=2
+BinaryOp                 add_122                  2 1 594 591 595 0=0
+BinaryOp                 add_123                  2 1 592 595 596 0=0
+DynamicQuantizeLinear    DynamicQuantizeLinear_313 1 3 596 597 598 599
+MemoryData               model.10.m.0.attn.proj.conv.weight_quantized 0 1 600 0=1 1=1 11=256 2=256
+ConvInteger              ConvInteger_315          4 1 597 600 599 42 601
+Tensor.to                Tensor.to_37             1 1 601 602
+MemoryData               /model.10/m/m.0/attn/proj/conv/Conv_output_0_bias_reshape_output 0 1 603 0=1 1=1 2=256
+BinaryOp                 mul_124                  1 1 598 604 0=2 1=1 2=7.39579368e-3
+BinaryOp                 mul_125                  2 1 602 604 605 0=2
+BinaryOp                 add_126                  2 1 605 603 606 0=0
+BinaryOp                 add_127                  2 1 562 606 607 0=0
+Split                    splitncnn_30             1 2 607 608 609
+DynamicQuantizeLinear    DynamicQuantizeLinear_320 1 3 608 610 611 612
+MemoryData               model.10.m.0.ffn.0.conv.weight_quantized 0 1 613 0=1 1=1 11=256 2=512
+ConvInteger              ConvInteger_322          4 1 610 613 612 43 614
+Tensor.to                Tensor.to_38             1 1 614 615
+MemoryData               /model.10/m/m.0/ffn/ffn.0/conv/Conv_output_0_bias_reshape_output 0 1 616 0=1 1=1 2=512
+BinaryOp                 mul_128                  1 1 611 617 0=2 1=1 2=4.95376810e-3
+BinaryOp                 mul_129                  2 1 615 617 618 0=2
+BinaryOp                 add_130                  2 1 618 616 619 0=0
+Swish                    silu_46                  1 1 619 620
+DynamicQuantizeLinear    DynamicQuantizeLinear_328 1 3 620 621 622 623
+MemoryData               model.10.m.0.ffn.1.conv.weight_quantized 0 1 624 0=1 1=1 11=512 2=256
+ConvInteger              ConvInteger_330          4 1 621 624 623 44 625
+Tensor.to                Tensor.to_39             1 1 625 626
+MemoryData               /model.10/m/m.0/ffn/ffn.1/conv/Conv_output_0_bias_reshape_output 0 1 627 0=1 1=1 2=256
+BinaryOp                 mul_131                  1 1 622 628 0=2 1=1 2=9.96580534e-3
+BinaryOp                 mul_132                  2 1 626 628 629 0=2
+BinaryOp                 add_133                  2 1 629 627 630 0=0
+BinaryOp                 add_134                  2 1 609 630 631 0=0
+Concat                   cat_7                    2 1 559 631 632 0=0
+DynamicQuantizeLinear    DynamicQuantizeLinear_336 1 3 632 633 634 635
+MemoryData               model.10.cv2.conv.weight_quantized 0 1 636 0=1 1=1 11=512 2=512
+ConvInteger              ConvInteger_338          4 1 633 636 635 45 637
+Tensor.to                Tensor.to_40             1 1 637 638
+MemoryData               /model.10/cv2/conv/Conv_output_0_bias_reshape_output 0 1 639 0=1 1=1 2=512
+BinaryOp                 mul_135                  1 1 634 640 0=2 1=1 2=3.42895277e-3
+BinaryOp                 mul_136                  2 1 638 640 641 0=2
+BinaryOp                 add_137                  2 1 641 639 642 0=0
+Swish                    silu_47                  1 1 642 643
+Split                    splitncnn_31             1 2 643 644 645
+Interp                   interpolate_0            1 1 645 646 0=1 1=2.0 2=2.0 6=0
+Concat                   cat_8                    2 1 646 379 647 0=0
+DynamicQuantizeLinear    DynamicQuantizeLinear_346 1 3 647 648 649 650
+MemoryData               model.13.cv1.conv.weight_quantized 0 1 651 0=1 1=1 11=768 2=256
+ConvInteger              ConvInteger_348          4 1 648 651 650 46 652
+Tensor.to                Tensor.to_41             1 1 652 653
+MemoryData               /model.13/cv1/conv/Conv_output_0_bias_reshape_output 0 1 654 0=1 1=1 2=256
+BinaryOp                 mul_138                  1 1 649 655 0=2 1=1 2=1.06238574e-2
+BinaryOp                 mul_139                  2 1 653 655 656 0=2
+BinaryOp                 add_140                  2 1 656 654 657 0=0
+Swish                    silu_48                  1 1 657 658
+Slice                    split_6                  1 2 658 659 660 -23300=2,128,128 1=0
+Split                    splitncnn_32             1 2 660 661 662
+DynamicQuantizeLinear    DynamicQuantizeLinear_355 1 3 661 663 664 665
+Split                    splitncnn_35             1 2 665 666 667
+Split                    splitncnn_34             1 2 664 668 669
+Split                    splitncnn_33             1 2 663 670 671
+MemoryData               model.13.m.0.cv1.conv.weight_quantized 0 1 672 0=1 1=1 11=128 2=64
+ConvInteger              ConvInteger_358          4 1 670 672 666 47 673
+MemoryData               model.13.m.0.cv2.conv.weight_quantized 0 1 674 0=1 1=1 11=128 2=64
+ConvInteger              ConvInteger_359          4 1 671 674 667 48 675
+Tensor.to                Tensor.to_42             1 1 673 676
+Tensor.to                Tensor.to_43             1 1 675 677
+MemoryData               /model.13/m.0/cv1/conv/Conv_output_0_bias_reshape_output 0 1 678 0=1 1=1 2=64
+BinaryOp                 mul_141                  1 1 668 679 0=2 1=1 2=6.20618323e-3
+BinaryOp                 mul_142                  2 1 676 679 680 0=2
+BinaryOp                 add_143                  2 1 680 678 681 0=0
+MemoryData               /model.13/m.0/cv2/conv/Conv_output_0_bias_reshape_output 0 1 682 0=1 1=1 2=64
+BinaryOp                 mul_144                  1 1 669 683 0=2 1=1 2=1.41075691e-2
+BinaryOp                 mul_145                  2 1 677 683 684 0=2
+BinaryOp                 add_146                  2 1 684 682 685 0=0
+Swish                    silu_49                  1 1 681 686
+Split                    splitncnn_36             1 2 686 687 688
+Swish                    silu_50                  1 1 685 689
+DynamicQuantizeLinear    DynamicQuantizeLinear_370 1 3 687 690 691 692
+MemoryData               model.13.m.0.m.0.cv1.conv.weight_quantized 0 1 693 0=3 1=3 11=64 2=64
+ConvInteger              ConvInteger_372          4 1 690 693 692 49 694
+Tensor.to                Tensor.to_44             1 1 694 695
+MemoryData               /model.13/m.0/m/m.0/cv1/conv/Conv_output_0_bias_reshape_output 0 1 696 0=1 1=1 2=64
+BinaryOp                 mul_147                  1 1 691 697 0=2 1=1 2=7.42806727e-3
+BinaryOp                 mul_148                  2 1 695 697 698 0=2
+BinaryOp                 add_149                  2 1 698 696 699 0=0
+Swish                    silu_51                  1 1 699 700
+DynamicQuantizeLinear    DynamicQuantizeLinear_378 1 3 700 701 702 703
+MemoryData               model.13.m.0.m.0.cv2.conv.weight_quantized 0 1 704 0=3 1=3 11=64 2=64
+ConvInteger              ConvInteger_380          4 1 701 704 703 50 705
+Tensor.to                Tensor.to_45             1 1 705 706
+MemoryData               /model.13/m.0/m/m.0/cv2/conv/Conv_output_0_bias_reshape_output 0 1 707 0=1 1=1 2=64
+BinaryOp                 mul_150                  1 1 702 708 0=2 1=1 2=4.04012203e-3
+BinaryOp                 mul_151                  2 1 706 708 709 0=2
+BinaryOp                 add_152                  2 1 709 707 710 0=0
+Split                    splitncnn_37             1 2 710 711 712
+Sigmoid                  sigmoid_12               1 1 712 713
+BinaryOp                 mul_153                  2 1 711 713 714 0=2
+BinaryOp                 add_154                  2 1 688 714 715 0=0
+Split                    splitncnn_38             1 2 715 716 717
+DynamicQuantizeLinear    DynamicQuantizeLinear_387 1 3 716 718 719 720
+MemoryData               model.13.m.0.m.1.cv1.conv.weight_quantized 0 1 721 0=3 1=3 11=64 2=64
+ConvInteger              ConvInteger_389          4 1 718 721 720 51 722
+Tensor.to                Tensor.to_46             1 1 722 723
+MemoryData               /model.13/m.0/m/m.1/cv1/conv/Conv_output_0_bias_reshape_output 0 1 724 0=1 1=1 2=64
+BinaryOp                 mul_155                  1 1 719 725 0=2 1=1 2=3.19552282e-3
+BinaryOp                 mul_156                  2 1 723 725 726 0=2
+BinaryOp                 add_157                  2 1 726 724 727 0=0
+Swish                    silu_52                  1 1 727 728
+DynamicQuantizeLinear    DynamicQuantizeLinear_395 1 3 728 729 730 731
+MemoryData               model.13.m.0.m.1.cv2.conv.weight_quantized 0 1 732 0=3 1=3 11=64 2=64
+ConvInteger              ConvInteger_397          4 1 729 732 731 52 733
+Tensor.to                Tensor.to_47             1 1 733 734
+MemoryData               /model.13/m.0/m/m.1/cv2/conv/Conv_output_0_bias_reshape_output 0 1 735 0=1 1=1 2=64
+BinaryOp                 mul_158                  1 1 730 736 0=2 1=1 2=6.04057778e-3
+BinaryOp                 mul_159                  2 1 734 736 737 0=2
+BinaryOp                 add_160                  2 1 737 735 738 0=0
+Split                    splitncnn_39             1 2 738 739 740
+Sigmoid                  sigmoid_13               1 1 740 741
+BinaryOp                 mul_161                  2 1 739 741 742 0=2
+BinaryOp                 add_162                  2 1 717 742 743 0=0
+Concat                   cat_9                    2 1 743 689 744 0=0
+DynamicQuantizeLinear    DynamicQuantizeLinear_405 1 3 744 745 746 747
+MemoryData               model.13.m.0.cv3.conv.weight_quantized 0 1 748 0=1 1=1 11=128 2=128
+ConvInteger              ConvInteger_407          4 1 745 748 747 53 749
+Tensor.to                Tensor.to_48             1 1 749 750
+MemoryData               /model.13/m.0/cv3/conv/Conv_output_0_bias_reshape_output 0 1 751 0=1 1=1 2=128
+BinaryOp                 mul_163                  1 1 746 752 0=2 1=1 2=3.76342493e-3
+BinaryOp                 mul_164                  2 1 750 752 753 0=2
+BinaryOp                 add_165                  2 1 753 751 754 0=0
+Swish                    silu_53                  1 1 754 755
+Concat                   cat_10                   3 1 659 662 755 756 0=0
+DynamicQuantizeLinear    DynamicQuantizeLinear_414 1 3 756 757 758 759
+MemoryData               model.13.cv2.conv.weight_quantized 0 1 760 0=1 1=1 11=384 2=256
+ConvInteger              ConvInteger_416          4 1 757 760 759 54 761
+Tensor.to                Tensor.to_49             1 1 761 762
+MemoryData               /model.13/cv2/conv/Conv_output_0_bias_reshape_output 0 1 763 0=1 1=1 2=256
+BinaryOp                 mul_166                  1 1 758 764 0=2 1=1 2=6.79336162e-3
+BinaryOp                 mul_167                  2 1 762 764 765 0=2
+BinaryOp                 add_168                  2 1 765 763 766 0=0
+Swish                    silu_54                  1 1 766 767
+Split                    splitncnn_40             1 2 767 768 769
+Interp                   interpolate_1            1 1 769 770 0=1 1=2.0 2=2.0 6=0
+Concat                   cat_11                   2 1 770 246 771 0=0
+DynamicQuantizeLinear    DynamicQuantizeLinear_424 1 3 771 772 773 774
+MemoryData               model.16.cv1.conv.weight_quantized 0 1 775 0=1 1=1 11=512 2=128
+ConvInteger              ConvInteger_426          4 1 772 775 774 55 776
+Tensor.to                Tensor.to_50             1 1 776 777
+MemoryData               /model.16/cv1/conv/Conv_output_0_bias_reshape_output 0 1 778 0=1 1=1 2=128
+BinaryOp                 mul_169                  1 1 773 779 0=2 1=1 2=7.12114293e-3
+BinaryOp                 mul_170                  2 1 777 779 780 0=2
+BinaryOp                 add_171                  2 1 780 778 781 0=0
+Swish                    silu_55                  1 1 781 782
+Slice                    split_7                  1 2 782 783 784 -23300=2,64,64 1=0
+Split                    splitncnn_41             1 2 784 785 786
+DynamicQuantizeLinear    DynamicQuantizeLinear_433 1 3 785 787 788 789
+Split                    splitncnn_44             1 2 789 790 791
+Split                    splitncnn_43             1 2 788 792 793
+Split                    splitncnn_42             1 2 787 794 795
+MemoryData               model.16.m.0.cv1.conv.weight_quantized 0 1 796 0=1 1=1 11=64 2=32
+ConvInteger              ConvInteger_436          4 1 794 796 790 56 797
+MemoryData               model.16.m.0.cv2.conv.weight_quantized 0 1 798 0=1 1=1 11=64 2=32
+ConvInteger              ConvInteger_437          4 1 795 798 791 57 799
+Tensor.to                Tensor.to_51             1 1 797 800
+Tensor.to                Tensor.to_52             1 1 799 801
+MemoryData               /model.16/m.0/cv1/conv/Conv_output_0_bias_reshape_output 0 1 802 0=1 1=1 2=32
+BinaryOp                 mul_172                  1 1 792 803 0=2 1=1 2=4.80475090e-3
+BinaryOp                 mul_173                  2 1 800 803 804 0=2
+BinaryOp                 add_174                  2 1 804 802 805 0=0
+MemoryData               /model.16/m.0/cv2/conv/Conv_output_0_bias_reshape_output 0 1 806 0=1 1=1 2=32
+BinaryOp                 mul_175                  1 1 793 807 0=2 1=1 2=2.66563259e-2
+BinaryOp                 mul_176                  2 1 801 807 808 0=2
+BinaryOp                 add_177                  2 1 808 806 809 0=0
+Swish                    silu_56                  1 1 805 810
+Split                    splitncnn_45             1 2 810 811 812
+Swish                    silu_57                  1 1 809 813
+DynamicQuantizeLinear    DynamicQuantizeLinear_448 1 3 811 814 815 816
+MemoryData               model.16.m.0.m.0.cv1.conv.weight_quantized 0 1 817 0=3 1=3 11=32 2=32
+ConvInteger              ConvInteger_450          4 1 814 817 816 58 818
+Tensor.to                Tensor.to_53             1 1 818 819
+MemoryData               /model.16/m.0/m/m.0/cv1/conv/Conv_output_0_bias_reshape_output 0 1 820 0=1 1=1 2=32
+BinaryOp                 mul_178                  1 1 815 821 0=2 1=1 2=2.74946541e-2
+BinaryOp                 mul_179                  2 1 819 821 822 0=2
+BinaryOp                 add_180                  2 1 822 820 823 0=0
+Swish                    silu_58                  1 1 823 824
+DynamicQuantizeLinear    DynamicQuantizeLinear_456 1 3 824 825 826 827
+MemoryData               model.16.m.0.m.0.cv2.conv.weight_quantized 0 1 828 0=3 1=3 11=32 2=32
+ConvInteger              ConvInteger_458          4 1 825 828 827 59 829
+Tensor.to                Tensor.to_54             1 1 829 830
+MemoryData               /model.16/m.0/m/m.0/cv2/conv/Conv_output_0_bias_reshape_output 0 1 831 0=1 1=1 2=32
+BinaryOp                 mul_181                  1 1 826 832 0=2 1=1 2=6.60197064e-3
+BinaryOp                 mul_182                  2 1 830 832 833 0=2
+BinaryOp                 add_183                  2 1 833 831 834 0=0
+Split                    splitncnn_46             1 2 834 835 836
+Sigmoid                  sigmoid_14               1 1 836 837
+BinaryOp                 mul_184                  2 1 835 837 838 0=2
+BinaryOp                 add_185                  2 1 812 838 839 0=0
+Split                    splitncnn_47             1 2 839 840 841
+DynamicQuantizeLinear    DynamicQuantizeLinear_465 1 3 840 842 843 844
+MemoryData               model.16.m.0.m.1.cv1.conv.weight_quantized 0 1 845 0=3 1=3 11=32 2=32
+ConvInteger              ConvInteger_467          4 1 842 845 844 60 846
+Tensor.to                Tensor.to_55             1 1 846 847
+MemoryData               /model.16/m.0/m/m.1/cv1/conv/Conv_output_0_bias_reshape_output 0 1 848 0=1 1=1 2=32
+BinaryOp                 mul_186                  1 1 843 849 0=2 1=1 2=8.99513811e-3
+BinaryOp                 mul_187                  2 1 847 849 850 0=2
+BinaryOp                 add_188                  2 1 850 848 851 0=0
+Swish                    silu_59                  1 1 851 852
+DynamicQuantizeLinear    DynamicQuantizeLinear_473 1 3 852 853 854 855
+MemoryData               model.16.m.0.m.1.cv2.conv.weight_quantized 0 1 856 0=3 1=3 11=32 2=32
+ConvInteger              ConvInteger_475          4 1 853 856 855 61 857
+Tensor.to                Tensor.to_56             1 1 857 858
+MemoryData               /model.16/m.0/m/m.1/cv2/conv/Conv_output_0_bias_reshape_output 0 1 859 0=1 1=1 2=32
+BinaryOp                 mul_189                  1 1 854 860 0=2 1=1 2=3.45438793e-2
+BinaryOp                 mul_190                  2 1 858 860 861 0=2
+BinaryOp                 add_191                  2 1 861 859 862 0=0
+Split                    splitncnn_48             1 2 862 863 864
+Sigmoid                  sigmoid_15               1 1 864 865
+BinaryOp                 mul_192                  2 1 863 865 866 0=2
+BinaryOp                 add_193                  2 1 841 866 867 0=0
+Concat                   cat_12                   2 1 867 813 868 0=0
+DynamicQuantizeLinear    DynamicQuantizeLinear_483 1 3 868 869 870 871
+MemoryData               model.16.m.0.cv3.conv.weight_quantized 0 1 872 0=1 1=1 11=64 2=64
+ConvInteger              ConvInteger_485          4 1 869 872 871 62 873
+Tensor.to                Tensor.to_57             1 1 873 874
+MemoryData               /model.16/m.0/cv3/conv/Conv_output_0_bias_reshape_output 0 1 875 0=1 1=1 2=64
+BinaryOp                 mul_194                  1 1 870 876 0=2 1=1 2=7.66479177e-3
+BinaryOp                 mul_195                  2 1 874 876 877 0=2
+BinaryOp                 add_196                  2 1 877 875 878 0=0
+Swish                    silu_60                  1 1 878 879
+Concat                   cat_13                   3 1 783 786 879 880 0=0
+DynamicQuantizeLinear    DynamicQuantizeLinear_492 1 3 880 881 882 883
+MemoryData               model.16.cv2.conv.weight_quantized 0 1 884 0=1 1=1 11=192 2=128
+ConvInteger              ConvInteger_494          4 1 881 884 883 63 885
+Tensor.to                Tensor.to_58             1 1 885 886
+MemoryData               /model.16/cv2/conv/Conv_output_0_bias_reshape_output 0 1 887 0=1 1=1 2=128
+BinaryOp                 mul_197                  1 1 882 888 0=2 1=1 2=1.13469064e-2
+BinaryOp                 mul_198                  2 1 886 888 889 0=2
+BinaryOp                 add_199                  2 1 889 887 890 0=0
+Swish                    silu_61                  1 1 890 891
+DynamicQuantizeLinear    DynamicQuantizeLinear_500 1 3 891 892 893 894
+Split                    splitncnn_51             1 3 894 895 896 897
+Split                    splitncnn_50             1 3 893 898 899 900
+Split                    splitncnn_49             1 3 892 901 902 903
+MemoryData               model.17.conv.weight_quantized 0 1 904 0=3 1=3 11=128 2=128
+ConvInteger              ConvInteger_504          4 1 901 904 895 64 905
+MemoryData               model.23.one2one_cv2.0.0.conv.weight_quantized 0 1 906 0=3 1=3 11=128 2=32
+ConvInteger              ConvInteger_505          4 1 902 906 896 65 907
+MemoryData               model.23.one2one_cv3.0.0.0.conv.weight_quantized 0 1 908 0=3 1=3 11=1 2=128
+ConvInteger              ConvInteger_506          4 1 903 908 897 66 909
+Tensor.to                Tensor.to_59             1 1 905 910
+Tensor.to                Tensor.to_60             1 1 907 911
+Tensor.to                Tensor.to_61             1 1 909 912
+MemoryData               /model.17/conv/Conv_output_0_bias_reshape_output 0 1 913 0=1 1=1 2=128
+BinaryOp                 mul_200                  1 1 898 914 0=2 1=1 2=4.61529335e-3
+BinaryOp                 mul_201                  2 1 910 914 915 0=2
+BinaryOp                 add_202                  2 1 915 913 916 0=0
+MemoryData               /model.23/one2one_cv2.0/one2one_cv2.0.0/conv/Conv_output_0_bias_reshape_output 0 1 917 0=1 1=1 2=32
+BinaryOp                 mul_203                  1 1 899 918 0=2 1=1 2=2.99046896e-2
+BinaryOp                 mul_204                  2 1 911 918 919 0=2
+BinaryOp                 add_205                  2 1 919 917 920 0=0
+MemoryData               /model.23/one2one_cv3.0/one2one_cv3.0.0/one2one_cv3.0.0.0/conv/Conv_output_0_bias_reshape_output 0 1 921 0=1 1=1 2=128
+BinaryOp                 mul_206                  1 1 900 922 0=2 1=1 2=4.38350663e-2
+BinaryOp                 mul_207                  2 1 912 922 923 0=2
+BinaryOp                 add_208                  2 1 923 921 924 0=0
+Swish                    silu_62                  1 1 916 925
+Swish                    silu_63                  1 1 920 926
+Swish                    silu_64                  1 1 924 927
+Concat                   cat_14                   2 1 925 768 928 0=0
+DynamicQuantizeLinear    DynamicQuantizeLinear_523 1 3 926 929 930 931
+DynamicQuantizeLinear    DynamicQuantizeLinear_524 1 3 927 932 933 934
+DynamicQuantizeLinear    DynamicQuantizeLinear_525 1 3 928 935 936 937
+MemoryData               model.23.one2one_cv2.0.1.conv.weight_quantized 0 1 938 0=3 1=3 11=32 2=32
+ConvInteger              ConvInteger_527          4 1 929 938 931 67 939
+MemoryData               model.23.one2one_cv3.0.0.1.conv.weight_quantized 0 1 940 0=1 1=1 11=128 2=128
+ConvInteger              ConvInteger_529          4 1 932 940 934 68 941
+MemoryData               model.19.cv1.conv.weight_quantized 0 1 942 0=1 1=1 11=384 2=256
+ConvInteger              ConvInteger_531          4 1 935 942 937 69 943
+Tensor.to                Tensor.to_62             1 1 939 944
+Tensor.to                Tensor.to_63             1 1 941 945
+Tensor.to                Tensor.to_64             1 1 943 946
+MemoryData               /model.23/one2one_cv2.0/one2one_cv2.0.1/conv/Conv_output_0_bias_reshape_output 0 1 947 0=1 1=1 2=32
+BinaryOp                 mul_209                  1 1 930 948 0=2 1=1 2=5.53314667e-3
+BinaryOp                 mul_210                  2 1 944 948 949 0=2
+BinaryOp                 add_211                  2 1 949 947 950 0=0
+MemoryData               /model.23/one2one_cv3.0/one2one_cv3.0.0/one2one_cv3.0.0.1/conv/Conv_output_0_bias_reshape_output 0 1 951 0=1 1=1 2=128
+BinaryOp                 mul_212                  1 1 933 952 0=2 1=1 2=8.91203433e-3
+BinaryOp                 mul_213                  2 1 945 952 953 0=2
+BinaryOp                 add_214                  2 1 953 951 954 0=0
+MemoryData               /model.19/cv1/conv/Conv_output_0_bias_reshape_output 0 1 955 0=1 1=1 2=256
+BinaryOp                 mul_215                  1 1 936 956 0=2 1=1 2=1.09467786e-2
+BinaryOp                 mul_216                  2 1 946 956 957 0=2
+BinaryOp                 add_217                  2 1 957 955 958 0=0
+Swish                    silu_65                  1 1 950 959
+Swish                    silu_66                  1 1 954 960
+Swish                    silu_67                  1 1 958 961
+DynamicQuantizeLinear    DynamicQuantizeLinear_547 1 3 959 962 963 964
+DynamicQuantizeLinear    DynamicQuantizeLinear_548 1 3 960 965 966 967
+Slice                    split_8                  1 2 961 968 969 -23300=2,128,128 1=0
+Split                    splitncnn_52             1 2 969 970 971
+MemoryData               model.23.one2one_cv2.0.2.weight_quantized 0 1 972 0=1 1=1 11=32 2=4
+ConvInteger              ConvInteger_551          4 1 962 972 964 70 973
+MemoryData               model.23.one2one_cv3.0.1.0.conv.weight_quantized 0 1 974 0=3 1=3 11=1 2=128
+ConvInteger              ConvInteger_553          4 1 965 974 967 71 975
+DynamicQuantizeLinear    DynamicQuantizeLinear_554 1 3 970 976 977 978
+Split                    splitncnn_55             1 2 978 979 980
+Split                    splitncnn_54             1 2 977 981 982
+Split                    splitncnn_53             1 2 976 983 984
+Tensor.to                Tensor.to_65             1 1 973 985
+Tensor.to                Tensor.to_66             1 1 975 986
+MemoryData               model.19.m.0.cv1.conv.weight_quantized 0 1 987 0=1 1=1 11=128 2=64
+ConvInteger              ConvInteger_559          4 1 983 987 979 72 988
+MemoryData               model.19.m.0.cv2.conv.weight_quantized 0 1 989 0=1 1=1 11=128 2=64
+ConvInteger              ConvInteger_560          4 1 984 989 980 73 990
+Tensor.to                Tensor.to_67             1 1 988 991
+Tensor.to                Tensor.to_68             1 1 990 992
+MemoryData               /model.23/one2one_cv2.0/one2one_cv2.0.2/Conv_output_0_bias_reshape_output 0 1 993 0=1 1=1 2=4
+BinaryOp                 mul_218                  1 1 963 994 0=2 1=1 2=5.39407181e-3
+BinaryOp                 mul_219                  2 1 985 994 995 0=2
+BinaryOp                 add_220                  2 1 995 993 996 0=0
+MemoryData               /model.23/one2one_cv3.0/one2one_cv3.0.1/one2one_cv3.0.1.0/conv/Conv_output_0_bias_reshape_output 0 1 997 0=1 1=1 2=128
+BinaryOp                 mul_221                  1 1 966 998 0=2 1=1 2=0.185541913
+BinaryOp                 mul_222                  2 1 986 998 999 0=2
+BinaryOp                 add_223                  2 1 999 997 1000 0=0
+Reshape                  reshape_103              1 1 996 1001 0=6400 1=4
+MemoryData               /model.19/m.0/cv1/conv/Conv_output_0_bias_reshape_output 0 1 1002 0=1 1=1 2=64
+BinaryOp                 mul_224                  1 1 981 1003 0=2 1=1 2=2.50528520e-3
+BinaryOp                 mul_225                  2 1 991 1003 1004 0=2
+BinaryOp                 add_226                  2 1 1004 1002 1005 0=0
+MemoryData               /model.19/m.0/cv2/conv/Conv_output_0_bias_reshape_output 0 1 1006 0=1 1=1 2=64
+BinaryOp                 mul_227                  1 1 982 1007 0=2 1=1 2=1.18472446e-2
+BinaryOp                 mul_228                  2 1 992 1007 1008 0=2
+BinaryOp                 add_229                  2 1 1008 1006 1009 0=0
+Swish                    silu_68                  1 1 1000 1010
+DynamicQuantizeLinear    DynamicQuantizeLinear_576 1 3 1010 1011 1012 1013
+Swish                    silu_69                  1 1 1005 1014
+Split                    splitncnn_56             1 2 1014 1015 1016
+Swish                    silu_70                  1 1 1009 1017
+MemoryData               model.23.one2one_cv3.0.1.1.conv.weight_quantized 0 1 1018 0=1 1=1 11=128 2=128
+ConvInteger              ConvInteger_580          4 1 1011 1018 1013 74 1019
+DynamicQuantizeLinear    DynamicQuantizeLinear_581 1 3 1015 1020 1021 1022
+Tensor.to                Tensor.to_69             1 1 1019 1023
+MemoryData               model.19.m.0.m.0.cv1.conv.weight_quantized 0 1 1024 0=3 1=3 11=64 2=64
+ConvInteger              ConvInteger_584          4 1 1020 1024 1022 75 1025
+Tensor.to                Tensor.to_70             1 1 1025 1026
+MemoryData               /model.23/one2one_cv3.0/one2one_cv3.0.1/one2one_cv3.0.1.1/conv/Conv_output_0_bias_reshape_output 0 1 1027 0=1 1=1 2=128
+BinaryOp                 mul_230                  1 1 1012 1028 0=2 1=1 2=5.70479035e-2
+BinaryOp                 mul_231                  2 1 1023 1028 1029 0=2
+BinaryOp                 add_232                  2 1 1029 1027 1030 0=0
+MemoryData               /model.19/m.0/m/m.0/cv1/conv/Conv_output_0_bias_reshape_output 0 1 1031 0=1 1=1 2=64
+BinaryOp                 mul_233                  1 1 1021 1032 0=2 1=1 2=2.48498134e-2
+BinaryOp                 mul_234                  2 1 1026 1032 1033 0=2
+BinaryOp                 add_235                  2 1 1033 1031 1034 0=0
+Swish                    silu_71                  1 1 1030 1035
+DynamicQuantizeLinear    DynamicQuantizeLinear_593 1 3 1035 1036 1037 1038
+Swish                    silu_72                  1 1 1034 1039
+MemoryData               model.23.one2one_cv3.0.2.weight_quantized 0 1 1040 0=1 1=1 2=128
+ConvInteger              ConvInteger_596          4 1 1036 1040 1038 76 1041
+DynamicQuantizeLinear    DynamicQuantizeLinear_597 1 3 1039 1042 1043 1044
+Tensor.to                Tensor.to_71             1 1 1041 1045
+MemoryData               model.19.m.0.m.0.cv2.conv.weight_quantized 0 1 1046 0=3 1=3 11=64 2=64
+ConvInteger              ConvInteger_600          4 1 1042 1046 1044 77 1047
+Tensor.to                Tensor.to_72             1 1 1047 1048
+BinaryOp                 mul_236                  1 1 1037 1049 0=2 1=1 2=8.06621450e-4
+BinaryOp                 mul_237                  2 1 1045 1049 1050 0=2
+BinaryOp                 add_238                  1 1 1050 1051 0=0 1=1 2=-7.19140625
+Reshape                  reshape_104              1 1 1051 1052 0=6400 1=1
+MemoryData               /model.19/m.0/m/m.0/cv2/conv/Conv_output_0_bias_reshape_output 0 1 1053 0=1 1=1 2=64
+BinaryOp                 mul_239                  1 1 1043 1054 0=2 1=1 2=5.52752474e-3
+BinaryOp                 mul_240                  2 1 1048 1054 1055 0=2
+BinaryOp                 add_241                  2 1 1055 1053 1056 0=0
+Split                    splitncnn_57             1 2 1056 1057 1058
+Sigmoid                  sigmoid_16               1 1 1058 1059
+BinaryOp                 mul_242                  2 1 1057 1059 1060 0=2
+BinaryOp                 add_243                  2 1 1016 1060 1061 0=0
+Split                    splitncnn_58             1 2 1061 1062 1063
+DynamicQuantizeLinear    DynamicQuantizeLinear_610 1 3 1062 1064 1065 1066
+MemoryData               model.19.m.0.m.1.cv1.conv.weight_quantized 0 1 1067 0=3 1=3 11=64 2=64
+ConvInteger              ConvInteger_612          4 1 1064 1067 1066 78 1068
+Tensor.to                Tensor.to_73             1 1 1068 1069
+MemoryData               /model.19/m.0/m/m.1/cv1/conv/Conv_output_0_bias_reshape_output 0 1 1070 0=1 1=1 2=64
+BinaryOp                 mul_244                  1 1 1065 1071 0=2 1=1 2=1.38490768e-2
+BinaryOp                 mul_245                  2 1 1069 1071 1072 0=2
+BinaryOp                 add_246                  2 1 1072 1070 1073 0=0
+Swish                    silu_73                  1 1 1073 1074
+DynamicQuantizeLinear    DynamicQuantizeLinear_618 1 3 1074 1075 1076 1077
+MemoryData               model.19.m.0.m.1.cv2.conv.weight_quantized 0 1 1078 0=3 1=3 11=64 2=64
+ConvInteger              ConvInteger_620          4 1 1075 1078 1077 79 1079
+Tensor.to                Tensor.to_74             1 1 1079 1080
+MemoryData               /model.19/m.0/m/m.1/cv2/conv/Conv_output_0_bias_reshape_output 0 1 1081 0=1 1=1 2=64
+BinaryOp                 mul_247                  1 1 1076 1082 0=2 1=1 2=1.06263291e-2
+BinaryOp                 mul_248                  2 1 1080 1082 1083 0=2
+BinaryOp                 add_249                  2 1 1083 1081 1084 0=0
+Split                    splitncnn_59             1 2 1084 1085 1086
+Sigmoid                  sigmoid_17               1 1 1086 1087
+BinaryOp                 mul_250                  2 1 1085 1087 1088 0=2
+BinaryOp                 add_251                  2 1 1063 1088 1089 0=0
+Concat                   cat_15                   2 1 1089 1017 1090 0=0
+DynamicQuantizeLinear    DynamicQuantizeLinear_628 1 3 1090 1091 1092 1093
+MemoryData               model.19.m.0.cv3.conv.weight_quantized 0 1 1094 0=1 1=1 11=128 2=128
+ConvInteger              ConvInteger_630          4 1 1091 1094 1093 80 1095
+Tensor.to                Tensor.to_75             1 1 1095 1096
+MemoryData               /model.19/m.0/cv3/conv/Conv_output_0_bias_reshape_output 0 1 1097 0=1 1=1 2=128
+BinaryOp                 mul_252                  1 1 1092 1098 0=2 1=1 2=1.02644134e-2
+BinaryOp                 mul_253                  2 1 1096 1098 1099 0=2
+BinaryOp                 add_254                  2 1 1099 1097 1100 0=0
+Swish                    silu_74                  1 1 1100 1101
+Concat                   cat_16                   3 1 968 971 1101 1102 0=0
+DynamicQuantizeLinear    DynamicQuantizeLinear_637 1 3 1102 1103 1104 1105
+MemoryData               model.19.cv2.conv.weight_quantized 0 1 1106 0=1 1=1 11=384 2=256
+ConvInteger              ConvInteger_639          4 1 1103 1106 1105 81 1107
+Tensor.to                Tensor.to_76             1 1 1107 1108
+MemoryData               /model.19/cv2/conv/Conv_output_0_bias_reshape_output 0 1 1109 0=1 1=1 2=256
+BinaryOp                 mul_255                  1 1 1104 1110 0=2 1=1 2=1.40603967e-2
+BinaryOp                 mul_256                  2 1 1108 1110 1111 0=2
+BinaryOp                 add_257                  2 1 1111 1109 1112 0=0
+Swish                    silu_75                  1 1 1112 1113
+DynamicQuantizeLinear    DynamicQuantizeLinear_645 1 3 1113 1114 1115 1116
+Split                    splitncnn_62             1 3 1116 1117 1118 1119
+Split                    splitncnn_61             1 3 1115 1120 1121 1122
+Split                    splitncnn_60             1 3 1114 1123 1124 1125
+MemoryData               model.20.conv.weight_quantized 0 1 1126 0=3 1=3 11=256 2=256
+ConvInteger              ConvInteger_649          4 1 1123 1126 1117 82 1127
+MemoryData               model.23.one2one_cv2.1.0.conv.weight_quantized 0 1 1128 0=3 1=3 11=256 2=32
+ConvInteger              ConvInteger_650          4 1 1124 1128 1118 83 1129
+MemoryData               model.23.one2one_cv3.1.0.0.conv.weight_quantized 0 1 1130 0=3 1=3 11=1 2=256
+ConvInteger              ConvInteger_651          4 1 1125 1130 1119 84 1131
+Tensor.to                Tensor.to_77             1 1 1127 1132
+Tensor.to                Tensor.to_78             1 1 1129 1133
+Tensor.to                Tensor.to_79             1 1 1131 1134
+MemoryData               /model.20/conv/Conv_output_0_bias_reshape_output 0 1 1135 0=1 1=1 2=256
+BinaryOp                 mul_258                  1 1 1120 1136 0=2 1=1 2=4.05596616e-3
+BinaryOp                 mul_259                  2 1 1132 1136 1137 0=2
+BinaryOp                 add_260                  2 1 1137 1135 1138 0=0
+MemoryData               /model.23/one2one_cv2.1/one2one_cv2.1.0/conv/Conv_output_0_bias_reshape_output 0 1 1139 0=1 1=1 2=32
+BinaryOp                 mul_261                  1 1 1121 1140 0=2 1=1 2=9.96501185e-3
+BinaryOp                 mul_262                  2 1 1133 1140 1141 0=2
+BinaryOp                 add_263                  2 1 1141 1139 1142 0=0
+MemoryData               /model.23/one2one_cv3.1/one2one_cv3.1.0/one2one_cv3.1.0.0/conv/Conv_output_0_bias_reshape_output 0 1 1143 0=1 1=1 2=256
+BinaryOp                 mul_264                  1 1 1122 1144 0=2 1=1 2=3.35555673e-2
+BinaryOp                 mul_265                  2 1 1134 1144 1145 0=2
+BinaryOp                 add_266                  2 1 1145 1143 1146 0=0
+Swish                    silu_76                  1 1 1138 1147
+Swish                    silu_77                  1 1 1142 1148
+Swish                    silu_78                  1 1 1146 1149
+Concat                   cat_17                   2 1 1147 644 1150 0=0
+DynamicQuantizeLinear    DynamicQuantizeLinear_668 1 3 1148 1151 1152 1153
+DynamicQuantizeLinear    DynamicQuantizeLinear_669 1 3 1149 1154 1155 1156
+DynamicQuantizeLinear    DynamicQuantizeLinear_670 1 3 1150 1157 1158 1159
+MemoryData               model.23.one2one_cv2.1.1.conv.weight_quantized 0 1 1160 0=3 1=3 11=32 2=32
+ConvInteger              ConvInteger_672          4 1 1151 1160 1153 85 1161
+MemoryData               model.23.one2one_cv3.1.0.1.conv.weight_quantized 0 1 1162 0=1 1=1 11=256 2=128
+ConvInteger              ConvInteger_674          4 1 1154 1162 1156 86 1163
+MemoryData               model.22.cv1.conv.weight_quantized 0 1 1164 0=1 1=1 11=768 2=512
+ConvInteger              ConvInteger_676          4 1 1157 1164 1159 87 1165
+Tensor.to                Tensor.to_80             1 1 1161 1166
+Tensor.to                Tensor.to_81             1 1 1163 1167
+Tensor.to                Tensor.to_82             1 1 1165 1168
+MemoryData               /model.23/one2one_cv2.1/one2one_cv2.1.1/conv/Conv_output_0_bias_reshape_output 0 1 1169 0=1 1=1 2=32
+BinaryOp                 mul_267                  1 1 1152 1170 0=2 1=1 2=6.20847894e-3
+BinaryOp                 mul_268                  2 1 1166 1170 1171 0=2
+BinaryOp                 add_269                  2 1 1171 1169 1172 0=0
+MemoryData               /model.23/one2one_cv3.1/one2one_cv3.1.0/one2one_cv3.1.0.1/conv/Conv_output_0_bias_reshape_output 0 1 1173 0=1 1=1 2=128
+BinaryOp                 mul_270                  1 1 1155 1174 0=2 1=1 2=8.67125113e-3
+BinaryOp                 mul_271                  2 1 1167 1174 1175 0=2
+BinaryOp                 add_272                  2 1 1175 1173 1176 0=0
+MemoryData               /model.22/cv1/conv/Conv_output_0_bias_reshape_output 0 1 1177 0=1 1=1 2=512
+BinaryOp                 mul_273                  1 1 1158 1178 0=2 1=1 2=1.11018391e-2
+BinaryOp                 mul_274                  2 1 1168 1178 1179 0=2
+BinaryOp                 add_275                  2 1 1179 1177 1180 0=0
+Swish                    silu_79                  1 1 1172 1181
+Swish                    silu_80                  1 1 1176 1182
+Swish                    silu_81                  1 1 1180 1183
+DynamicQuantizeLinear    DynamicQuantizeLinear_692 1 3 1181 1184 1185 1186
+DynamicQuantizeLinear    DynamicQuantizeLinear_693 1 3 1182 1187 1188 1189
+Slice                    split_9                  1 2 1183 1190 1191 -23300=2,256,256 1=0
+Split                    splitncnn_63             1 3 1191 1192 1193 1194
+MemoryData               model.23.one2one_cv2.1.2.weight_quantized 0 1 1195 0=1 1=1 11=32 2=4
+ConvInteger              ConvInteger_696          4 1 1184 1195 1186 88 1196
+MemoryData               model.23.one2one_cv3.1.1.0.conv.weight_quantized 0 1 1197 0=3 1=3 11=1 2=128
+ConvInteger              ConvInteger_698          4 1 1187 1197 1189 89 1198
+DynamicQuantizeLinear    DynamicQuantizeLinear_699 1 3 1192 1199 1200 1201
+Tensor.to                Tensor.to_83             1 1 1196 1202
+Tensor.to                Tensor.to_84             1 1 1198 1203
+MemoryData               model.22.m.0.0.cv1.conv.weight_quantized 0 1 1204 0=3 1=3 11=256 2=128
+ConvInteger              ConvInteger_703          4 1 1199 1204 1201 90 1205
+Tensor.to                Tensor.to_85             1 1 1205 1206
+MemoryData               /model.23/one2one_cv2.1/one2one_cv2.1.2/Conv_output_0_bias_reshape_output 0 1 1207 0=1 1=1 2=4
+BinaryOp                 mul_276                  1 1 1185 1208 0=2 1=1 2=5.92064951e-3
+BinaryOp                 mul_277                  2 1 1202 1208 1209 0=2
+BinaryOp                 add_278                  2 1 1209 1207 1210 0=0
+MemoryData               /model.23/one2one_cv3.1/one2one_cv3.1.1/one2one_cv3.1.1.0/conv/Conv_output_0_bias_reshape_output 0 1 1211 0=1 1=1 2=128
+BinaryOp                 mul_279                  1 1 1188 1212 0=2 1=1 2=0.105124965
+BinaryOp                 mul_280                  2 1 1203 1212 1213 0=2
+BinaryOp                 add_281                  2 1 1213 1211 1214 0=0
+Reshape                  reshape_105              1 1 1210 1215 0=1600 1=4
+MemoryData               /model.22/m.0/m.0.0/cv1/conv/Conv_output_0_bias_reshape_output 0 1 1216 0=1 1=1 2=128
+BinaryOp                 mul_282                  1 1 1200 1217 0=2 1=1 2=5.04862890e-3
+BinaryOp                 mul_283                  2 1 1206 1217 1218 0=2
+BinaryOp                 add_284                  2 1 1218 1216 1219 0=0
+Swish                    silu_82                  1 1 1214 1220
+DynamicQuantizeLinear    DynamicQuantizeLinear_715 1 3 1220 1221 1222 1223
+Swish                    silu_83                  1 1 1219 1224
+MemoryData               model.23.one2one_cv3.1.1.1.conv.weight_quantized 0 1 1225 0=1 1=1 11=128 2=128
+ConvInteger              ConvInteger_718          4 1 1221 1225 1223 91 1226
+DynamicQuantizeLinear    DynamicQuantizeLinear_719 1 3 1224 1227 1228 1229
+Tensor.to                Tensor.to_86             1 1 1226 1230
+MemoryData               model.22.m.0.0.cv2.conv.weight_quantized 0 1 1231 0=3 1=3 11=128 2=256
+ConvInteger              ConvInteger_722          4 1 1227 1231 1229 92 1232
+Tensor.to                Tensor.to_87             1 1 1232 1233
+MemoryData               /model.23/one2one_cv3.1/one2one_cv3.1.1/one2one_cv3.1.1.1/conv/Conv_output_0_bias_reshape_output 0 1 1234 0=1 1=1 2=128
+BinaryOp                 mul_285                  1 1 1222 1235 0=2 1=1 2=0.114275493
+BinaryOp                 mul_286                  2 1 1230 1235 1236 0=2
+BinaryOp                 add_287                  2 1 1236 1234 1237 0=0
+MemoryData               /model.22/m.0/m.0.0/cv2/conv/Conv_output_0_bias_reshape_output 0 1 1238 0=1 1=1 2=256
+BinaryOp                 mul_288                  1 1 1228 1239 0=2 1=1 2=5.03125554e-3
+BinaryOp                 mul_289                  2 1 1233 1239 1240 0=2
+BinaryOp                 add_290                  2 1 1240 1238 1241 0=0
+Split                    splitncnn_64             1 2 1241 1242 1243
+Swish                    silu_84                  1 1 1237 1244
+Sigmoid                  sigmoid_18               1 1 1243 1245
+DynamicQuantizeLinear    DynamicQuantizeLinear_731 1 3 1244 1246 1247 1248
+MemoryData               model.23.one2one_cv3.1.2.weight_quantized 0 1 1249 0=1 1=1 2=128
+ConvInteger              ConvInteger_734          4 1 1246 1249 1248 93 1250
+BinaryOp                 mul_291                  2 1 1242 1245 1251 0=2
+BinaryOp                 add_292                  2 1 1194 1251 1252 0=0
+Split                    splitncnn_65             1 2 1252 1253 1254
+Tensor.to                Tensor.to_88             1 1 1250 1255
+DynamicQuantizeLinear    DynamicQuantizeLinear_737 1 3 1253 1256 1257 1258
+MemoryData               model.22.m.0.1.attn.qkv.conv.weight_quantized 0 1 1259 0=1 1=1 11=256 2=512
+ConvInteger              ConvInteger_740          4 1 1256 1259 1258 94 1260
+BinaryOp                 mul_293                  1 1 1247 1261 0=2 1=1 2=0.000848269
+BinaryOp                 mul_294                  2 1 1255 1261 1262 0=2
+BinaryOp                 add_295                  1 1 1262 1263 0=0 1=1 2=-5.80078125
+Tensor.to                Tensor.to_89             1 1 1260 1264
+Reshape                  reshape_106              1 1 1263 1265 0=1600 1=1
+MemoryData               /model.22/m.0/m.0.1/attn/qkv/conv/Conv_output_0_bias_reshape_output 0 1 1266 0=1 1=1 2=512
+BinaryOp                 mul_296                  1 1 1257 1267 0=2 1=1 2=6.90880651e-3
+BinaryOp                 mul_297                  2 1 1264 1267 1268 0=2
+BinaryOp                 add_298                  2 1 1268 1266 1269 0=0
+Reshape                  reshape_107              1 1 1269 1270 0=400 1=128 2=4
+Slice                    split_10                 1 3 1270 1271 1272 1273 -23300=3,32,32,64 1=1
+Split                    splitncnn_66             1 2 1273 1274 1275
+Permute                  permute_97               1 1 1271 1276 0=1
+Reshape                  reshape_108              1 1 1274 1277 0=20 1=20 2=256
+MatMul                   matmul_116               2 1 1276 1272 1278
+DynamicQuantizeLinear    DynamicQuantizeLinear_751 1 3 1277 1279 1280 1281
+BinaryOp                 mul_299                  1 1 1278 1282 0=2 1=1 2=0.176776692
+MemoryData               model.22.m.0.1.attn.pe.conv.weight_quantized 0 1 1283 0=3 1=3 11=1 2=256
+ConvInteger              ConvInteger_754          4 1 1279 1283 1281 95 1284
+Softmax                  softmax_94               1 1 1282 1285 0=2 1=1
+Tensor.to                Tensor.to_90             1 1 1284 1286
+MatMul                   matmultransb_1           2 1 1275 1285 1287 0=1
+MemoryData               /model.22/m.0/m.0.1/attn/pe/conv/Conv_output_0_bias_reshape_output 0 1 1288 0=1 1=1 2=256
+Reshape                  reshape_109              1 1 1287 1289 0=20 1=20 2=256
+BinaryOp                 mul_300                  1 1 1280 1290 0=2 1=1 2=0.0414654
+BinaryOp                 mul_301                  2 1 1286 1290 1291 0=2
+BinaryOp                 add_302                  2 1 1291 1288 1292 0=0
+BinaryOp                 add_303                  2 1 1289 1292 1293 0=0
+DynamicQuantizeLinear    DynamicQuantizeLinear_763 1 3 1293 1294 1295 1296
+MemoryData               model.22.m.0.1.attn.proj.conv.weight_quantized 0 1 1297 0=1 1=1 11=256 2=256
+ConvInteger              ConvInteger_765          4 1 1294 1297 1296 96 1298
+Tensor.to                Tensor.to_91             1 1 1298 1299
+MemoryData               /model.22/m.0/m.0.1/attn/proj/conv/Conv_output_0_bias_reshape_output 0 1 1300 0=1 1=1 2=256
+BinaryOp                 mul_304                  1 1 1295 1301 0=2 1=1 2=3.49435769e-3
+BinaryOp                 mul_305                  2 1 1299 1301 1302 0=2
+BinaryOp                 add_306                  2 1 1302 1300 1303 0=0
+BinaryOp                 add_307                  2 1 1254 1303 1304 0=0
+Split                    splitncnn_67             1 2 1304 1305 1306
+DynamicQuantizeLinear    DynamicQuantizeLinear_770 1 3 1305 1307 1308 1309
+MemoryData               model.22.m.0.1.ffn.0.conv.weight_quantized 0 1 1310 0=1 1=1 11=256 2=512
+ConvInteger              ConvInteger_772          4 1 1307 1310 1309 97 1311
+Tensor.to                Tensor.to_92             1 1 1311 1312
+MemoryData               /model.22/m.0/m.0.1/ffn/ffn.0/conv/Conv_output_0_bias_reshape_output 0 1 1313 0=1 1=1 2=512
+BinaryOp                 mul_308                  1 1 1308 1314 0=2 1=1 2=0.00505134
+BinaryOp                 mul_309                  2 1 1312 1314 1315 0=2
+BinaryOp                 add_310                  2 1 1315 1313 1316 0=0
+Swish                    silu_85                  1 1 1316 1317
+DynamicQuantizeLinear    DynamicQuantizeLinear_778 1 3 1317 1318 1319 1320
+MemoryData               model.22.m.0.1.ffn.1.conv.weight_quantized 0 1 1321 0=1 1=1 11=512 2=256
+ConvInteger              ConvInteger_780          4 1 1318 1321 1320 98 1322
+Tensor.to                Tensor.to_93             1 1 1322 1323
+MemoryData               /model.22/m.0/m.0.1/ffn/ffn.1/conv/Conv_output_0_bias_reshape_output 0 1 1324 0=1 1=1 2=256
+BinaryOp                 mul_311                  1 1 1319 1325 0=2 1=1 2=4.82488889e-3
+BinaryOp                 mul_312                  2 1 1323 1325 1326 0=2
+BinaryOp                 add_313                  2 1 1326 1324 1327 0=0
+BinaryOp                 add_314                  2 1 1306 1327 1328 0=0
+Concat                   cat_18                   3 1 1190 1193 1328 1329 0=0
+DynamicQuantizeLinear    DynamicQuantizeLinear_786 1 3 1329 1330 1331 1332
+MemoryData               model.22.cv2.conv.weight_quantized 0 1 1333 0=1 1=1 11=768 2=512
+ConvInteger              ConvInteger_788          4 1 1330 1333 1332 99 1334
+Tensor.to                Tensor.to_94             1 1 1334 1335
+MemoryData               /model.22/cv2/conv/Conv_output_0_bias_reshape_output 0 1 1336 0=1 1=1 2=512
+BinaryOp                 mul_315                  1 1 1331 1337 0=2 1=1 2=3.45841539e-3
+BinaryOp                 mul_316                  2 1 1335 1337 1338 0=2
+BinaryOp                 add_317                  2 1 1338 1336 1339 0=0
+Swish                    silu_86                  1 1 1339 1340
+DynamicQuantizeLinear    DynamicQuantizeLinear_794 1 3 1340 1341 1342 1343
+Split                    splitncnn_70             1 2 1343 1344 1345
+Split                    splitncnn_69             1 2 1342 1346 1347
+Split                    splitncnn_68             1 2 1341 1348 1349
+MemoryData               model.23.one2one_cv2.2.0.conv.weight_quantized 0 1 1350 0=3 1=3 11=512 2=32
+ConvInteger              ConvInteger_797          4 1 1348 1350 1344 100 1351
+MemoryData               model.23.one2one_cv3.2.0.0.conv.weight_quantized 0 1 1352 0=3 1=3 11=1 2=512
+ConvInteger              ConvInteger_798          4 1 1349 1352 1345 101 1353
+Tensor.to                Tensor.to_95             1 1 1351 1354
+Tensor.to                Tensor.to_96             1 1 1353 1355
+MemoryData               /model.23/one2one_cv2.2/one2one_cv2.2.0/conv/Conv_output_0_bias_reshape_output 0 1 1356 0=1 1=1 2=32
+BinaryOp                 mul_318                  1 1 1346 1357 0=2 1=1 2=1.29692373e-3
+BinaryOp                 mul_319                  2 1 1354 1357 1358 0=2
+BinaryOp                 add_320                  2 1 1358 1356 1359 0=0
+MemoryData               /model.23/one2one_cv3.2/one2one_cv3.2.0/one2one_cv3.2.0.0/conv/Conv_output_0_bias_reshape_output 0 1 1360 0=1 1=1 2=512
+BinaryOp                 mul_321                  1 1 1347 1361 0=2 1=1 2=8.97119939e-2
+BinaryOp                 mul_322                  2 1 1355 1361 1362 0=2
+BinaryOp                 add_323                  2 1 1362 1360 1363 0=0
+Swish                    silu_87                  1 1 1359 1364
+Swish                    silu_88                  1 1 1363 1365
+DynamicQuantizeLinear    DynamicQuantizeLinear_809 1 3 1364 1366 1367 1368
+DynamicQuantizeLinear    DynamicQuantizeLinear_810 1 3 1365 1369 1370 1371
+MemoryData               model.23.one2one_cv2.2.1.conv.weight_quantized 0 1 1372 0=3 1=3 11=32 2=32
+ConvInteger              ConvInteger_812          4 1 1366 1372 1368 102 1373
+MemoryData               model.23.one2one_cv3.2.0.1.conv.weight_quantized 0 1 1374 0=1 1=1 11=512 2=128
+ConvInteger              ConvInteger_814          4 1 1369 1374 1371 103 1375
+Tensor.to                Tensor.to_97             1 1 1373 1376
+Tensor.to                Tensor.to_98             1 1 1375 1377
+MemoryData               /model.23/one2one_cv2.2/one2one_cv2.2.1/conv/Conv_output_0_bias_reshape_output 0 1 1378 0=1 1=1 2=32
+BinaryOp                 mul_324                  1 1 1367 1379 0=2 1=1 2=9.21498239e-3
+BinaryOp                 mul_325                  2 1 1376 1379 1380 0=2
+BinaryOp                 add_326                  2 1 1380 1378 1381 0=0
+MemoryData               /model.23/one2one_cv3.2/one2one_cv3.2.0/one2one_cv3.2.0.1/conv/Conv_output_0_bias_reshape_output 0 1 1382 0=1 1=1 2=128
+BinaryOp                 mul_327                  1 1 1370 1383 0=2 1=1 2=3.47608258e-3
+BinaryOp                 mul_328                  2 1 1377 1383 1384 0=2
+BinaryOp                 add_329                  2 1 1384 1382 1385 0=0
+Swish                    silu_89                  1 1 1381 1386
+Swish                    silu_90                  1 1 1385 1387
+DynamicQuantizeLinear    DynamicQuantizeLinear_825 1 3 1386 1388 1389 1390
+DynamicQuantizeLinear    DynamicQuantizeLinear_826 1 3 1387 1391 1392 1393
+MemoryData               model.23.one2one_cv2.2.2.weight_quantized 0 1 1394 0=1 1=1 11=32 2=4
+ConvInteger              ConvInteger_828          4 1 1388 1394 1390 104 1395
+MemoryData               model.23.one2one_cv3.2.1.0.conv.weight_quantized 0 1 1396 0=3 1=3 11=1 2=128
+ConvInteger              ConvInteger_830          4 1 1391 1396 1393 105 1397
+Tensor.to                Tensor.to_99             1 1 1395 1398
+Tensor.to                Tensor.to_100            1 1 1397 1399
+MemoryData               /model.23/one2one_cv2.2/one2one_cv2.2.2/Conv_output_0_bias_reshape_output 0 1 1400 0=1 1=1 2=4
+BinaryOp                 mul_330                  1 1 1389 1401 0=2 1=1 2=5.28779859e-3
+BinaryOp                 mul_331                  2 1 1398 1401 1402 0=2
+BinaryOp                 add_332                  2 1 1402 1400 1403 0=0
+MemoryData               /model.23/one2one_cv3.2/one2one_cv3.2.1/one2one_cv3.2.1.0/conv/Conv_output_0_bias_reshape_output 0 1 1404 0=1 1=1 2=128
+BinaryOp                 mul_333                  1 1 1392 1405 0=2 1=1 2=0.054530587
+BinaryOp                 mul_334                  2 1 1399 1405 1406 0=2
+BinaryOp                 add_335                  2 1 1406 1404 1407 0=0
+Reshape                  reshape_110              1 1 1403 1408 0=400 1=4
+Concat                   cat_19                   3 1 1001 1215 1408 1409 0=1
+Swish                    silu_91                  1 1 1407 1410
+Slice                    tensor_split_0           1 2 1409 1411 1412 -23300=2,2,-233 1=0
+DynamicQuantizeLinear    DynamicQuantizeLinear_843 1 3 1410 1413 1414 1415
+MemoryData               /model.23/Constant_12_output_0 0 1 1416 0=8400 1=2
+Split                    splitncnn_0              1 2 1416 1417 1418
+BinaryOp                 sub_336                  2 1 1417 1411 1419 0=1
+BinaryOp                 add_337                  2 1 1418 1412 1420 0=0
+MemoryData               model.23.one2one_cv3.2.1.1.conv.weight_quantized 0 1 1421 0=1 1=1 11=128 2=128
+ConvInteger              ConvInteger_847          4 1 1413 1421 1415 106 1422
+Concat                   cat_20                   2 1 1419 1420 1423 0=0
+Tensor.to                Tensor.to_101            1 1 1422 1424
+MemoryData               /model.23/Constant_14_output_0 0 1 1425 0=8400
+Reshape                  reshape_111              1 1 1425 1426 0=8400 1=1
+BinaryOp                 mul_338                  2 1 1423 1426 1427 0=2
+MemoryData               /model.23/one2one_cv3.2/one2one_cv3.2.1/one2one_cv3.2.1.1/conv/Conv_output_0_bias_reshape_output 0 1 1428 0=1 1=1 2=128
+BinaryOp                 mul_339                  1 1 1414 1429 0=2 1=1 2=8.95331204e-2
+BinaryOp                 mul_340                  2 1 1424 1429 1430 0=2
+BinaryOp                 add_341                  2 1 1430 1428 1431 0=0
+Swish                    silu_92                  1 1 1431 1432
+DynamicQuantizeLinear    DynamicQuantizeLinear_855 1 3 1432 1433 1434 1435
+MemoryData               model.23.one2one_cv3.2.2.weight_quantized 0 1 1436 0=1 1=1 2=128
+ConvInteger              ConvInteger_857          4 1 1433 1436 1435 107 1437
+Tensor.to                Tensor.to_102            1 1 1437 1438
+BinaryOp                 mul_342                  1 1 1434 1439 0=2 1=1 2=7.55040790e-4
+BinaryOp                 mul_343                  2 1 1438 1439 1440 0=2
+BinaryOp                 add_344                  1 1 1440 1441 0=0 1=1 2=-4.421875
+Reshape                  reshape_112              1 1 1441 1442 0=400 1=1
+Concat                   cat_21                   3 1 1052 1265 1442 1443 0=1
+Sigmoid                  sigmoid_19               1 1 1443 1444
+Concat                   cat_22                   2 1 1427 1444 1445 0=0
+Permute                  permute_99               1 1 1445 1446 0=1
+Slice                    split_11                 1 2 1446 1447 1448 -23300=2,4,1 1=1
+Split                    splitncnn_71             1 2 1448 1449 1450
+Reduction                max_118                  1 1 1450 1451 0=4 1=0 -23303=1,-1 4=0 5=1
+pnnx.Expression          pnnx_expr_2              0 1 1452
+Split                    splitncnn_72             1 2 1452 1453 1454
+TopK                     TopK_868                 2 2 1451 1453 1455 1456
+ExpandDims               unsqueeze_119            1 1 1456 1457 -23303=1,-1
+Split                    splitncnn_73             1 2 1457 1458 1459
+Reshape                  flatten_122              1 1 1459 1460 0=1 1=300
+torch.tile               torch.tile_140           1 1 1458 1461
+GatherElements           GatherElements_872       2 1 1449 1461 1462
+Flatten                  flatten_113              1 1 1462 1463
+TopK                     TopK_874                 2 2 1463 1454 1464 1465
+Split                    splitncnn_74             1 2 1465 1466 1467
+ExpandDims               unsqueeze_120            1 1 1464 1468 -23303=1,1
+pnnx.Expression          pnnx_expr_0              0 1 1469
+Mod                      Mod_876                  2 1 1466 1469 1470
+Gather                   Gather_877               2 1 1460 1467 1471
+ExpandDims               unsqueeze_121            1 1 1470 1472 -23303=1,1
+torch.tile               torch.tile_141           1 1 1471 1473
+Tensor.to                Tensor.to_103            1 1 1472 1474
+GatherElements           GatherElements_881       2 1 1447 1473 1475
+Concat                   cat_23                   3 1 1475 1468 1474 out0 0=1

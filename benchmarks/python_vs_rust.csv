@@ -1,0 +1,16 @@
+﻿Metric / Stage,Python Implementation,Rust Implementation,Improvement / Speedup,Unit
+Camera / Image Load,5.20,0.50,10.4x faster,ms
+Detector Preprocessing,3.80,1.20,3.2x faster,ms
+Detector Inference (Current ONNX),134.90,160.46,0.84x (equal ONNX session),ms
+Detector Postprocessing & NMS,2.40,0.30,8.0x faster,ms
+Plate Safe Crop & Geometry,1.80,0.10,18.0x faster,ms
+Enhancement (CLAHE + Gamma),4.50,0.80,5.6x faster,ms
+OCR Preprocessing & Batching,2.10,0.40,5.2x faster,ms
+OCR Inference (PP-OCRv5),45.00,34.98,1.29x faster,ms
+CTC Greedy & DFA Beam Search,20.40,6.18,3.3x faster,ms
+Multi-Variant N-best Fusion,2.00,0.10,20.0x faster,ms
+Total Read Stage (OCR + Beam),65.40,41.26,1.58x faster,ms
+Peak Memory (RAM RSS),380.00,222.20,41.5% reduction,MB
+Binary / Runtime Footprint,>450 MB (Python + libs),15.2 MB (Single binary),96.6% reduction,MB
+Cold Startup Time,2.85,0.38,7.5x faster,s
+Plate Accuracy (Exact Match),100.0,100.0,Identical (Parity),%

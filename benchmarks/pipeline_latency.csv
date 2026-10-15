@@ -1,0 +1,8 @@
+configuration,camera_capture_ms,frame_prepare_ms,detector_preprocess_ms,detector_inference_ms,detector_postprocess_ms,crop_ms,plate_preprocess_ms,ocr_preprocess_ms,ocr_inference_ms,ctc_decode_ms,grammar_decode_ms,final_postprocess_ms,total_pipeline_ms,fps
+Current ONNX,0.00,0.50,1.20,111.57,0.30,0.10,0.80,0.40,0.00,0.00,0.00,0.10,111.58,8.96
+Current ONNX,0.00,0.50,1.20,111.57,0.30,0.10,0.80,0.40,0.00,0.00,0.00,0.10,91.78,10.90
+Current ONNX,0.00,0.50,1.20,98.90,0.30,0.10,0.80,0.40,0.00,0.00,0.00,0.10,98.91,10.11
+Current ONNX,0.00,0.50,1.20,98.90,0.30,0.10,0.80,0.40,0.00,0.00,0.00,0.10,94.43,10.59
+Current ONNX,0.00,0.50,1.20,98.90,0.30,0.10,0.80,0.40,0.00,0.00,0.00,0.10,96.14,10.40
+Current ONNX,0.00,0.50,1.20,98.90,0.30,0.10,0.80,0.40,0.00,0.00,0.00,0.10,93.07,10.74
+Current ONNX,0.00,0.50,1.20,98.90,0.30,0.10,0.80,0.40,0.00,0.00,0.00,0.10,91.34,10.95

@@ -1,0 +1,8 @@
+# Cargo build configuration optimized for Raspberry Pi 5 (ARM Cortex-A76)
+
+[target.aarch64-unknown-linux-gnu]
+rustflags = [
+    "-C", "target-cpu=cortex-a76",
+    "-C", "target-feature=+neon,+fp16,+dotprod",
+    "-C", "link-arg=-Wl,--as-needed",
+]

@@ -1,0 +1,35 @@
+# Dedicated Performance Profile for Raspberry Pi 5 (8GB RAM, Broadcom BCM2712 Quad-Core Cortex-A76 @ 2.4 GHz)
+
+[detector]
+model_path = "models/current/detector_int8.onnx"
+backend = "onnx"
+input_size = 640
+confidence_threshold = 0.30
+nms_threshold = 0.45
+max_plates = 2
+crop_padding = 4
+threads = 4
+allow_spinning = false
+
+[recognizer]
+model_path = "models/current/recognizer.onnx"
+charset_path = "models/current/charset.txt"
+input_height = 48
+input_width = 320
+threads = 4
+allow_spinning = false
+grayscale = false
+
+[decoding]
+lambda_grammar = 1.0
+beam_width = 4
+nbest = 4
+num_variants = 2
+strict_grammar = false
+
+[runtime]
+threads = 4
+allow_spinning = false
+frame_skip = 1
+camera_resolution = [1280, 720]
+tracking = true

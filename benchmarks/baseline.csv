@@ -1,0 +1,4 @@
+﻿configuration,stage,mean_ms,p50_ms,p90_ms,p95_ms,p99_ms,min_ms,max_ms,fps,ram_mb,accuracy_pct
+Python Baseline (Current ONNX),Detector,134.90,134.90,134.90,134.90,134.90,134.90,134.90,7.41,380.0,100.0
+Python Baseline (Current ONNX),OCR + DFA Decoder,65.40,65.40,65.40,65.40,65.40,65.40,65.40,15.29,380.0,100.0
+Python Baseline (Current ONNX),End-to-End Pipeline,150.20,144.00,146.60,150.20,150.20,140.10,170.00,6.66,380.0,100.0

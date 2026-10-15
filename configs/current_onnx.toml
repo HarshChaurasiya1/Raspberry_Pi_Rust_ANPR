@@ -1,0 +1,33 @@
+# Configuration 1: Current Detector + ONNX Runtime
+[detector]
+model_path = "models/current/detector_int8.onnx"
+backend = "onnx"
+input_size = 640
+confidence_threshold = 0.25
+nms_threshold = 0.45
+max_plates = 3
+crop_padding = 4
+threads = 4
+allow_spinning = true
+
+[recognizer]
+model_path = "models/current/recognizer.onnx"
+charset_path = "models/current/charset.txt"
+input_height = 48
+input_width = 320
+threads = 4
+allow_spinning = true
+grayscale = false
+
+[decoding]
+lambda_grammar = 1.0
+beam_width = 6
+nbest = 6
+num_variants = 3
+strict_grammar = false
+
+[runtime]
+threads = 4
+allow_spinning = true
+frame_skip = 1
+camera_resolution = [1280, 720]
