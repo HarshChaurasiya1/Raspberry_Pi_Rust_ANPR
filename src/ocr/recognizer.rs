@@ -15,6 +15,20 @@ pub const PLATE_CHARSET: &[char] = &[
     'W', 'X', 'Y', 'Z'
 ];
 
+#[inline(always)]
+pub fn char_to_plate_idx(c: char) -> Option<usize> {
+    let b = c as u32;
+    if (b'0' as u32..=b'9' as u32).contains(&b) {
+        Some((b - b'0' as u32 + 1) as usize)
+    } else if (b'A' as u32..=b'Z' as u32).contains(&b) {
+        Some((b - b'A' as u32 + 11) as usize)
+    } else if b == b'-' as u32 {
+        Some(0)
+    } else {
+        None
+    }
+}
+
 pub struct PlateRecognizer {
     session: Session,
     groups: Vec<Vec<usize>>,
@@ -148,23 +162,27 @@ impl PlateRecognizer {
             }
 
             // Grouped projection directly to 37 plate characters (global denominator cancels out!)
-            let mut plate_step_probs = [0.0f64; 37];
-            let mut total_plate_prob = 0.0f64;
+            let mut plate_step_probs = [0.0f32; 37];
+            let mut total_plate_prob = 0.0f32;
             for (k, group) in self.groups.iter().enumerate() {
-                let mut p_k = 0.0f64;
+                let mut p_k = 0.0f32;
                 for &idx in group {
                     if idx < num_classes {
-                        p_k += ((step_logits[idx] - max_l) as f64).exp();
+                        p_k += (step_logits[idx] - max_l).exp();
                     }
                 }
                 plate_step_probs[k] = p_k;
                 total_plate_prob += p_k;
             }
 
-            let norm_denom = total_plate_prob.max(1e-12);
+            let log_denom = total_plate_prob.max(1e-12).ln();
             for k in 0..PLATE_CHARSET.len() {
-                let p = (plate_step_probs[k] / norm_denom).max(1e-12);
-                plate_log_probs[[t, k]] = p.ln() as f32;
+                let pk = plate_step_probs[k];
+                plate_log_probs[[t, k]] = if pk > 1e-12 {
+                    pk.ln() - log_denom
+                } else {
+                    -27.631021
+                };
             }
         }
 

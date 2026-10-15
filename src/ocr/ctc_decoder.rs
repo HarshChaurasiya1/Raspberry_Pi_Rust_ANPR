@@ -1,9 +1,9 @@
-﻿//! Grammar-constrained CTC prefix beam search, greedy decoding, and N-best fusion.
+//! Grammar-constrained CTC prefix beam search, greedy decoding, and N-best fusion.
 
 use std::collections::HashMap;
 use ndarray::Array2;
 use crate::grammar::{PlateDFA, DfaState};
-use crate::ocr::recognizer::PLATE_CHARSET;
+use crate::ocr::recognizer::{char_to_plate_idx, PLATE_CHARSET};
 
 pub const NEG_INF: f32 = -1e30;
 
@@ -73,7 +73,7 @@ pub fn ctc_gcd_beam_search(
 
             // 2. Repeat last character: prefix unchanged
             if let Some(last_ch) = prefix.chars().last() {
-                if let Some(last_idx) = PLATE_CHARSET.iter().position(|&c| c == last_ch) {
+                if let Some(last_idx) = char_to_plate_idx(last_ch) {
                     let lp_repeat = log_probs[[t, last_idx]];
                     let entry = nxt.entry(prefix.clone()).or_insert_with(|| BeamEntry::new(NEG_INF, NEG_INF, b.g, b.state.clone()));
                     entry.p_nb = logaddexp(entry.p_nb, b.p_nb + lp_repeat);
@@ -84,7 +84,7 @@ pub fn ctc_gcd_beam_search(
             if let Some(d) = dfa {
                 if let Some(ref st) = b.state {
                     for (&ch, (nxt_st, w)) in d.allowed(st).iter() {
-                        if let Some(idx) = PLATE_CHARSET.iter().position(|&c| c == ch) {
+                        if let Some(idx) = char_to_plate_idx(ch) {
                             let mut new_prefix = prefix.clone();
                             new_prefix.push(ch);
 
