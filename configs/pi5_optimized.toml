@@ -4,7 +4,7 @@
 model_path = "models/current/detector_int8.onnx"
 backend = "onnx"
 input_size = 640
-confidence_threshold = 0.30
+confidence_threshold = 0.50
 nms_threshold = 0.45
 max_plates = 2
 crop_padding = 4
@@ -22,9 +22,9 @@ grayscale = false
 
 [decoding]
 lambda_grammar = 1.0
-beam_width = 4
-nbest = 4
-num_variants = 2
+beam_width = 2
+nbest = 2
+num_variants = 1
 strict_grammar = false
 
 [runtime]

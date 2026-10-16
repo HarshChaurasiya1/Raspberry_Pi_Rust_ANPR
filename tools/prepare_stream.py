@@ -42,7 +42,7 @@ def main() -> int:
             "ffmpeg", "-y",
             "-threads", "4",
             "-i", args.video,
-            "-vf", f"select='not(mod(n\\,{args.frame_skip}))',scale={args.width}:{args.height}:flags=fast_bilinear,setpts=N/30/TB",
+            "-vf", f"select='not(mod(n\\,{args.frame_skip}))',scale={args.width}:{args.height}:flags=lanczos,unsharp=5:5:1.0:3:3:0.0,eq=contrast=1.15:brightness=0.02,setpts=N/30/TB",
             "-r", "30",
             "-c:v", "libx264",
             "-preset", "ultrafast",

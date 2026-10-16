@@ -243,7 +243,11 @@ impl ANPRPipeline {
                 }
 
                 let crop = det.crop(image, self.cfg.detector.crop_padding);
-                if crop.width() == 0 || crop.height() == 0 {
+                if crop.width() < 30 || crop.height() < 12 {
+                    continue;
+                }
+                let aspect = crop.width() as f32 / (crop.height() as f32).max(1.0);
+                if aspect < 1.30 || aspect > 6.2 {
                     continue;
                 }
 
@@ -264,7 +268,11 @@ impl ANPRPipeline {
                 results.push(res);
             } else {
                 let crop = det.crop(image, self.cfg.detector.crop_padding);
-                if crop.width() == 0 || crop.height() == 0 {
+                if crop.width() < 30 || crop.height() < 12 {
+                    continue;
+                }
+                let aspect = crop.width() as f32 / (crop.height() as f32).max(1.0);
+                if aspect < 1.30 || aspect > 6.2 {
                     continue;
                 }
 
