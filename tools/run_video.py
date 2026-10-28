@@ -161,16 +161,159 @@ class AsyncVideoReader:
         self.thread.join(timeout=2.0)
 
 
+class SystemMetricsMonitor:
+    """Monitors CPU %, RAM MB, SoC Temp, Clock Freq in background thread and logs matrix to CSV."""
+    def __init__(self, out_csv: str = "benchmarks/system_metrics.csv", sample_interval: float = 1.0):
+        self.out_csv = out_csv
+        self.sample_interval = sample_interval
+        self.samples = []
+        self.running = True
+        self.rolling_fps = 0.0
+        self.t_start = time.perf_counter()
+        self.lock = threading.Lock()
+        self._last_proc_stat = None
+
+        os.makedirs(os.path.dirname(self.out_csv) or ".", exist_ok=True)
+        self.csv_file = open(self.out_csv, "w", newline="", encoding="utf-8")
+        self.writer = csv.writer(self.csv_file)
+        self.writer.writerow(["elapsed_s", "cpu_pct", "ram_used_mb", "ram_pct", "temp_c", "freq_mhz", "rolling_fps"])
+        self.csv_file.flush()
+
+        self.thread = threading.Thread(target=self._loop, daemon=True)
+        self.thread.start()
+
+    def update_fps(self, fps: float):
+        self.rolling_fps = fps
+
+    def _read_cpu_pct(self):
+        if os.path.exists("/proc/stat"):
+            try:
+                with open("/proc/stat", "r") as f:
+                    fields = [float(x) for x in f.readline().strip().split()[1:]]
+                    idle = fields[3] + fields[4]
+                    total = sum(fields)
+                    if self._last_proc_stat is not None:
+                        last_idle, last_total = self._last_proc_stat
+                        d_idle = idle - last_idle
+                        d_total = total - last_total
+                        self._last_proc_stat = (idle, total)
+                        if d_total > 0:
+                            return max(0.0, min(100.0, 100.0 * (1.0 - d_idle / d_total)))
+                    else:
+                        self._last_proc_stat = (idle, total)
+            except Exception:
+                pass
+        try:
+            import psutil
+            return psutil.cpu_percent(interval=None)
+        except Exception:
+            return 0.0
+
+    def _read_ram(self):
+        if os.path.exists("/proc/meminfo"):
+            try:
+                mem = {}
+                with open("/proc/meminfo", "r") as f:
+                    for line in f:
+                        parts = line.split(":")
+                        if len(parts) == 2:
+                            mem[parts[0].strip()] = int(parts[1].strip().split()[0])
+                total_kb = mem.get("MemTotal", 1)
+                avail_kb = mem.get("MemAvailable", mem.get("MemFree", 0))
+                used_kb = max(total_kb - avail_kb, 0)
+                return used_kb / 1024.0, (used_kb / total_kb) * 100.0
+            except Exception:
+                pass
+        try:
+            import psutil
+            v = psutil.virtual_memory()
+            return v.used / (1024 * 1024), v.percent
+        except Exception:
+            return 0.0, 0.0
+
+    def _read_temp(self):
+        if os.path.exists("/sys/class/thermal/thermal_zone0/temp"):
+            try:
+                with open("/sys/class/thermal/thermal_zone0/temp", "r") as f:
+                    return float(f.read().strip()) / 1000.0
+            except Exception:
+                pass
+        return 0.0
+
+    def _read_freq(self):
+        if os.path.exists("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"):
+            try:
+                with open("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq", "r") as f:
+                    return float(f.read().strip()) / 1000.0
+            except Exception:
+                pass
+        return 0.0
+
+    def _loop(self):
+        while self.running:
+            t_now = time.perf_counter() - self.t_start
+            cpu_pct = self._read_cpu_pct()
+            ram_mb, ram_pct = self._read_ram()
+            temp_c = self._read_temp()
+            freq_mhz = self._read_freq()
+            fps = self.rolling_fps
+
+            row = (t_now, cpu_pct, ram_mb, ram_pct, temp_c, freq_mhz, fps)
+            with self.lock:
+                self.samples.append(row)
+                self.writer.writerow([f"{t_now:.2f}", f"{cpu_pct:.1f}", f"{ram_mb:.1f}", f"{ram_pct:.1f}", f"{temp_c:.1f}", f"{freq_mhz:.0f}", f"{fps:.1f}"])
+                self.csv_file.flush()
+            time.sleep(self.sample_interval)
+
+    def stop(self):
+        self.running = False
+        self.thread.join(timeout=2.0)
+        try:
+            self.csv_file.close()
+        except Exception:
+            pass
+
+    def print_matrix(self):
+        if not self.samples:
+            return
+        cpus = [s[1] for s in self.samples if s[1] > 0]
+        rams = [s[2] for s in self.samples if s[2] > 0]
+        ram_pcts = [s[3] for s in self.samples if s[3] > 0]
+        temps = [s[4] for s in self.samples if s[4] > 0]
+        freqs = [s[5] for s in self.samples if s[5] > 0]
+        fpss = [s[6] for s in self.samples if s[6] > 0]
+
+        print("=" * 74, flush=True)
+        print("SYSTEM RESOURCE UTILIZATION MATRIX (Raspberry Pi 5)", flush=True)
+        print("=" * 74, flush=True)
+        if cpus:
+            print(f"CPU Utilization        : Avg: {sum(cpus)/len(cpus):.1f}% | Min: {min(cpus):.1f}% | Peak: {max(cpus):.1f}%")
+        if rams:
+            avg_r, peak_r = sum(rams)/len(rams), max(rams)
+            avg_rp = sum(ram_pcts)/len(ram_pcts) if ram_pcts else 0
+            print(f"RAM Memory Footprint   : Avg: {avg_r:.0f} MB ({avg_rp:.1f}%) | Peak: {peak_r:.0f} MB")
+        if temps:
+            print(f"SoC Thermal Core Temp  : Avg: {sum(temps)/len(temps):.1f}°C | Min: {min(temps):.1f}°C | Max: {max(temps):.1f}°C")
+        if freqs:
+            print(f"CPU Clock Frequency    : Avg: {sum(freqs)/len(freqs):.0f} MHz (BCM2712 Quad Cortex-A76)")
+        if fpss:
+            print(f"Peak Rolling Speed     : {max(fpss):.1f} FPS")
+        print(f"Metrics CSV Saved To   : {self.out_csv}")
+        print("=" * 74, flush=True)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Run High-Speed Rust ANPR Stream Engine on video")
     ap.add_argument("--video", default="samples/my_car.mp4", help="Path to input video (.mp4)")
     ap.add_argument("--config", default="configs/pi5_optimized.toml", help="TOML config path")
     ap.add_argument("--out-video", default="benchmarks/annotated_output.mp4", help="Output annotated MP4 path")
     ap.add_argument("--out-csv", default="benchmarks/video_results.csv", help="Output CSV path")
+    ap.add_argument("--out-metrics", default="benchmarks/system_metrics.csv", help="Output system metrics CSV path")
     ap.add_argument("--frame-skip", type=int, default=15, help="Sample every Nth video frame (default: 15)")
     ap.add_argument("--max-frames", type=int, default=0, help="Max sampled frames (0 = full video)")
     ap.add_argument("--workers", type=int, default=0, help="Number of parallel ANPR worker processes (0 = auto)")
     ap.add_argument("--threads", type=int, default=0, help="Number of threads per worker (0 = from config)")
+    ap.add_argument("--detector-interval", "--interval", type=int, default=0, help="Override detector skip interval (e.g. 3 or 4)")
     ap.add_argument("--no-video", action="store_true", help="Disable MP4 video re-encoding for maximum inference FPS")
     args = ap.parse_args()
 
@@ -251,8 +394,11 @@ def main() -> int:
         if args.threads > 0:
             stream_cmd.extend(["--threads", str(args.threads)])
         elif num_workers > 1:
-            th_per_w = max(cpu_cores // num_workers, 2)
+            th_per_w = max(cpu_cores // num_workers, 1)
             stream_cmd.extend(["--threads", str(th_per_w)])
+
+        if args.detector_interval > 0:
+            stream_cmd.extend(["--detector-interval", str(args.detector_interval)])
 
         stream_cmd.extend([
             "stream",
@@ -298,6 +444,7 @@ def main() -> int:
     csv_fh = open(args.out_csv, "w", newline="", encoding="utf-8")
     csv_writer = csv.writer(csv_fh)
     csv_writer.writerow(["frame_idx", "timestamp_s", "plate", "valid", "greedy", "det_score", "read_ms", "track_id"])
+    monitor = SystemMetricsMonitor(out_csv=args.out_metrics)
 
     async_writer = None
     if not args.no_video:
@@ -340,6 +487,7 @@ def main() -> int:
                 next_seq += 1
                 sampled_count += 1
                 rolling_fps = sampled_count / max(time.perf_counter() - t_start, 1e-6)
+                monitor.update_fps(rolling_fps)
                 rust_ms = resp.get("ms", dt_frame * 1000.0)
 
                 plates = resp.get("plates", [])
@@ -422,6 +570,7 @@ def main() -> int:
                     active_feed = False
 
     finally:
+        monitor.stop()
         reader.release()
         for q in in_queues:
             q.put(None)
@@ -454,7 +603,9 @@ def main() -> int:
     if not args.no_video:
         print(f"Output Annotated Video   : {args.out_video}")
     print(f"Output CSV Plate Log     : {args.out_csv}")
+    print(f"Output Metrics Matrix    : {args.out_metrics}")
     print("=" * 74, flush=True)
+    monitor.print_matrix()
     print("\nTo evaluate against ground truth, run:")
     print(f"  python3 tools/evaluate_video_gt.py --csv {args.out_csv} --gt samples/my_car_ground_truth.txt\n")
     return 0

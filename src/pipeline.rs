@@ -39,6 +39,7 @@ pub struct ANPRPipeline {
     pub dfa: PlateDFA,
     static_oog_cache: SharedOogCache,
     pub tracker: PlateTracker,
+    pub frame_count: usize,
 }
 
 impl ANPRPipeline {
@@ -70,6 +71,7 @@ impl ANPRPipeline {
             dfa,
             static_oog_cache,
             tracker: PlateTracker::default(),
+            frame_count: 0,
         })
     }
 
@@ -206,6 +208,74 @@ impl ANPRPipeline {
     }
 
     pub fn process_tracked(&mut self, image: &RgbImage) -> Result<Vec<PlateResult>> {
+
+        self.frame_count += 1;
+        let det_interval = self.cfg.runtime.detector_interval.max(1);
+
+        // Temporal Gating Fast-Path: On skip frames, use active tracks (0ms detector!)
+        if det_interval > 1 && (self.frame_count % det_interval != 1) {
+            let has_active = self.tracker.tracks.iter().any(|t| t.misses == 0);
+            if has_active {
+                let mut results = Vec::new();
+                let mut matched_indices = Vec::new();
+
+                for t_idx in 0..self.tracker.tracks.len() {
+                    let (bbox, conf, is_noise, det_score, id) = {
+                        let t = &self.tracker.tracks[t_idx];
+                        if t.misses > 0 { continue; }
+                        (t.bbox, t.confirmed, t.is_noise, t.detection_score, t.id)
+                    };
+                    matched_indices.push(t_idx);
+
+                    if conf {
+                        let track = &self.tracker.tracks[t_idx];
+                        results.push(crate::tracker::PlateTracker::build_cached_result(track, det_score, 0.0));
+                        continue;
+                    }
+                    if is_noise {
+                        let track = &self.tracker.tracks[t_idx];
+                        let mut r = crate::tracker::PlateTracker::build_cached_result(track, det_score, 0.0);
+                        r.valid = false;
+                        results.push(r);
+                        continue;
+                    }
+
+                    let (x1, y1, x2, y2) = bbox;
+                    let pad = self.cfg.detector.crop_padding;
+                    let cx1 = x1.saturating_sub(pad);
+                    let cy1 = y1.saturating_sub(pad);
+                    let cx2 = (x2 + pad).min(image.width());
+                    let cy2 = (y2 + pad).min(image.height());
+                    let cw = cx2.saturating_sub(cx1);
+                    let ch = cy2.saturating_sub(cy1);
+
+                    if cw < 30 || ch < 12 { continue; }
+
+                    let sub = image::imageops::crop_imm(image, cx1, cy1, cw, ch).to_image();
+                    let is_edge = x1 <= 8 || x2 >= image.width().saturating_sub(8);
+                    let two_line = !is_edge && crate::image::is_two_line(&sub);
+
+                    let t1 = std::time::Instant::now();
+                    let mut res = self.decode_crop_ext(&sub, two_line)?;
+                    let t_rec = t1.elapsed().as_secs_f64() * 1000.0;
+
+                    res.detection_score = det_score;
+                    res.box_tuple = bbox;
+                    res.timings_ms.insert("detect".to_string(), 0.0);
+                    res.timings_ms.insert("read".to_string(), t_rec);
+                    res.track_id = Some(id);
+
+                    self.tracker.update_track_ocr(t_idx, &res);
+                    results.push(res);
+                }
+
+                self.tracker.step_age(&matched_indices);
+                return Ok(results);
+            } else {
+                self.tracker.step_age(&[]);
+                return Ok(Vec::new());
+            }
+        }
         let t0 = Instant::now();
         let detections = self.detector.detect(image)?;
         let t_det = t0.elapsed().as_secs_f64() * 1000.0;
@@ -221,6 +291,39 @@ impl ANPRPipeline {
         for (d_idx, maybe_t_idx) in matches {
             let det = &active_dets[d_idx];
             let box_tuple = det_boxes[d_idx];
+
+            let grid_key = (box_tuple.0 / 32, box_tuple.1 / 32, box_tuple.2 / 32, box_tuple.3 / 32);
+            let cached_noise = self
+                .static_oog_cache
+                .read()
+                .ok()
+                .and_then(|map| map.get(&grid_key).cloned());
+
+            if let Some((cached_text, hits)) = cached_noise {
+                if hits >= 2 {
+                    let mut timings = HashMap::new();
+                    timings.insert("detect".to_string(), t_det);
+                    timings.insert("read".to_string(), 0.0);
+                    let track_id = if let Some(t_idx) = maybe_t_idx {
+                        matched_track_indices.push(t_idx);
+                        Some(self.tracker.tracks[t_idx].id)
+                    } else {
+                        None
+                    };
+                    results.push(PlateResult {
+                        text: cached_text.clone(),
+                        score: f32::NEG_INFINITY,
+                        detection_score: det.score,
+                        box_tuple,
+                        greedy_text: cached_text,
+                        valid: false,
+                        two_line: false,
+                        timings_ms: timings,
+                        track_id,
+                    });
+                    continue;
+                }
+            }
 
             if let Some(t_idx) = maybe_t_idx {
                 matched_track_indices.push(t_idx);
@@ -258,6 +361,17 @@ impl ANPRPipeline {
                 let mut res = self.decode_crop_ext(&crop, two_line)?;
                 let t_rec = t1.elapsed().as_secs_f64() * 1000.0;
 
+                if !res.valid && res.text.len() <= 6 {
+                    if let Ok(mut map) = self.static_oog_cache.write() {
+                        let entry = map.entry(grid_key).or_insert_with(|| (res.text.clone(), 0));
+                        entry.1 += 1;
+                    }
+                } else if res.valid {
+                    if let Ok(mut map) = self.static_oog_cache.write() {
+                        map.remove(&grid_key);
+                    }
+                }
+
                 res.detection_score = det.score;
                 res.box_tuple = box_tuple;
                 res.timings_ms.insert("detect".to_string(), t_det);
@@ -283,13 +397,23 @@ impl ANPRPipeline {
                 let mut res = self.decode_crop_ext(&crop, two_line)?;
                 let t_rec = t1.elapsed().as_secs_f64() * 1000.0;
 
+                if !res.valid && res.text.len() <= 6 {
+                    if let Ok(mut map) = self.static_oog_cache.write() {
+                        let entry = map.entry(grid_key).or_insert_with(|| (res.text.clone(), 0));
+                        entry.1 += 1;
+                    }
+                } else if res.valid {
+                    if let Ok(mut map) = self.static_oog_cache.write() {
+                        map.remove(&grid_key);
+                    }
+                }
+
+                let t_idx = self.tracker.create_track(box_tuple, det.score, Some(&res));
+                matched_track_indices.push(t_idx);
                 res.detection_score = det.score;
                 res.box_tuple = box_tuple;
                 res.timings_ms.insert("detect".to_string(), t_det);
                 res.timings_ms.insert("read".to_string(), t_rec);
-
-                let t_idx = self.tracker.create_track(box_tuple, det.score, Some(&res));
-                matched_track_indices.push(t_idx);
                 res.track_id = Some(self.tracker.tracks[t_idx].id);
                 results.push(res);
             }

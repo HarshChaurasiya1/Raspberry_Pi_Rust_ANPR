@@ -37,6 +37,9 @@ struct Cli {
     lambda_grammar: Option<f32>,
 
     #[arg(long)]
+    detector_interval: Option<usize>,
+
+    #[arg(long)]
     fast: bool,
 
     #[command(subcommand)]
@@ -459,6 +462,9 @@ fn main() -> Result<()> {
     }
     if let Some(c) = cli.conf {
         cfg.detector.confidence_threshold = c;
+    }
+    if let Some(di) = cli.detector_interval {
+        cfg.runtime.detector_interval = di;
     }
     if let Some(l) = cli.lambda_grammar {
         cfg.decoding.lambda_grammar = l;

@@ -32,16 +32,22 @@ import numpy as np
 class RustStreamWorker:
     """Persistent zero-disk-I/O pipe to `target/release/anpr.exe stream`."""
 
-    def __init__(self, anpr_bin: str, config: str, width: int, height: int) -> None:
+    def __init__(self, anpr_bin: str, config: str, width: int, height: int, detector_interval: int = 4, threads: int = 4) -> None:
         self.width = width
         self.height = height
         self.cmd = [
             anpr_bin,
             "--config", config,
+        ]
+        if detector_interval > 0:
+            self.cmd.extend(["--detector-interval", str(detector_interval)])
+        if threads > 0:
+            self.cmd.extend(["--threads", str(threads)])
+        self.cmd.extend([
             "stream",
             "--width", str(width),
             "--height", str(height),
-        ]
+        ])
         self.proc = subprocess.Popen(
             self.cmd,
             stdin=subprocess.PIPE,
@@ -63,6 +69,7 @@ class RustStreamWorker:
         self.running = True
         self.csv_rows = []
         self.recent_log = []  # last 5 valid plates
+        self.t_worker_start = time.perf_counter()
 
         self.thread = threading.Thread(target=self._worker_loop, daemon=True)
         self.thread.start()
@@ -107,9 +114,15 @@ class RustStreamWorker:
 
             with self.lock:
                 self.processed_frames += 1
+                if ms > 0.0:
+                    self.anpr_ms = ms
+                else:
+                    self.anpr_ms = dt * 1000.0
+
+                rolling_fps = self.processed_frames / max(time.perf_counter() - self.t_worker_start, 1e-6)
                 inst_fps = 1.0 / max(dt, 1e-6)
-                self.anpr_fps = inst_fps if self.anpr_fps == 0.0 else (0.8 * self.anpr_fps + 0.2 * inst_fps)
-                self.anpr_ms = ms
+                # When no plates are in view and frames skip in 0ms, smooth with rolling FPS
+                self.anpr_fps = 0.90 * self.anpr_fps + 0.10 * min(inst_fps, 35.0) if self.anpr_fps > 0 else min(rolling_fps, 30.0)
                 self.latest_plates = plates
 
                 for p in plates:
@@ -168,23 +181,39 @@ def open_capture(args: argparse.Namespace):
             if not cap.isOpened():
                 cap = cv2.VideoCapture(args.camera)
         else:
-            cap = cv2.VideoCapture(args.camera)
+            cap = cv2.VideoCapture(args.camera, cv2.CAP_V4L2)
+            if not cap.isOpened() or not cap.read()[0]:
+                cap = cv2.VideoCapture(args.camera)
+            if not cap.isOpened() or not cap.read()[0]:
+                for probe_i in [0, 1, 2, 4, 6]:
+                    if probe_i == args.camera:
+                        continue
+                    p_cap = cv2.VideoCapture(probe_i, cv2.CAP_V4L2)
+                    if p_cap.isOpened() and p_cap.read()[0]:
+                        cap = p_cap
+                        args.camera = probe_i
+                        break
+        # Force MJPG codec so USB webcam doesn't fall back to 5.0 FPS uncompressed YUYV
+        cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
         cap.set(cv2.CAP_PROP_FPS, 30)
-        source_name = f"OBS Virtual Camera / Live Device #{args.camera}"
+        source_name = f"Live Camera Device #{args.camera}"
         is_live_camera = True
 
     return cap, source_name, is_live_camera
 
 
 def main() -> int:
+    default_cfg = "configs/pi5_optimized.toml" if os.path.exists("configs/pi5_optimized.toml") else "configs/current_onnx.toml"
     ap = argparse.ArgumentParser(description="Real-Time 1:1 OBS Virtual Camera & Live Video ANPR Runner")
-    ap.add_argument("--camera", type=int, default=0, help="Camera index (default: 0 = OBS Virtual Camera)")
+    ap.add_argument("--camera", type=int, default=0, help="Camera index (default: 0 = OBS Virtual Camera / default device)")
     ap.add_argument("--video", default="", help="Optional path to video file to run in strict 1:1 real-time mode")
-    ap.add_argument("--config", default="configs/current_onnx.toml", help="TOML config path")
+    ap.add_argument("--config", default=default_cfg, help="TOML config path")
     ap.add_argument("--out-csv", default="benchmarks/obs_live_results.csv", help="CSV output path")
     ap.add_argument("--max-seconds", type=float, default=0.0, help="Stop after N seconds (0 = run until end or 'Q' pressed)")
+    ap.add_argument("--detector-interval", "--interval", type=int, default=4, help="Detector skip interval (default: 4)")
+    ap.add_argument("--threads", type=int, default=4, help="Threads for inference (default: 4)")
     ap.add_argument("--headless", action="store_true", help="Run without opening a GUI preview window")
     args = ap.parse_args()
 
@@ -218,7 +247,7 @@ def main() -> int:
         print("Controls     : Press 'Q' or 'ESC' in the video window (or Ctrl+C here) to stop", flush=True)
     print("-" * 76, flush=True)
 
-    worker = RustStreamWorker(anpr_bin, args.config, proc_w, proc_h)
+    worker = RustStreamWorker(anpr_bin, args.config, proc_w, proc_h, detector_interval=args.detector_interval, threads=args.threads)
     t_start = time.perf_counter()
     frame_idx = 0
 

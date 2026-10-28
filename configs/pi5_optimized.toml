@@ -4,7 +4,7 @@
 model_path = "models/current/detector_int8.onnx"
 backend = "onnx"
 input_size = 640
-confidence_threshold = 0.50
+confidence_threshold = 0.55
 nms_threshold = 0.45
 max_plates = 2
 crop_padding = 4
@@ -33,3 +33,5 @@ allow_spinning = false
 frame_skip = 1
 camera_resolution = [1280, 720]
 tracking = true
+
+detector_interval = 4

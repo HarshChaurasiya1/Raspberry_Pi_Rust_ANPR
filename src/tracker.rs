@@ -36,7 +36,7 @@ pub struct PlateTracker {
 
 impl Default for PlateTracker {
     fn default() -> Self {
-        Self::new(0.20, 2, 3)
+        Self::new(0.20, 2, 2)
     }
 }
 

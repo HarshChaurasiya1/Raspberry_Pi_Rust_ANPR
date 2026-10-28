@@ -119,6 +119,8 @@ pub struct RuntimeConfig {
     pub camera_resolution: (u32, u32),
     #[serde(default = "default_true")]
     pub tracking: bool,
+    #[serde(default = "default_detector_interval")]
+    pub detector_interval: usize,
 }
 
 impl Default for RuntimeConfig {
@@ -129,6 +131,7 @@ impl Default for RuntimeConfig {
             frame_skip: default_frame_skip(),
             camera_resolution: default_cam_res(),
             tracking: true,
+            detector_interval: 2,
         }
     }
 }
@@ -167,6 +170,7 @@ fn default_nbest() -> usize { 8 }
 fn default_num_variants() -> usize { 3 }
 fn default_frame_skip() -> usize { 1 }
 fn default_cam_res() -> (u32, u32) { (1280, 720) }
+fn default_detector_interval() -> usize { 2 }
 
 impl Config {
     pub fn load<P: AsRef<Path>>(path: P) -> Result<Self> {
