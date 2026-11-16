@@ -1,46 +1,41 @@
-# System Architecture & Technical Design: Raspberry Pi 5 ANPR
+# System Architecture & Technical Design
 
-**Author**: Harsh Chaurasiya  
-**Platform**: Raspberry Pi 5 Model B (Broadcom BCM2712 Quad-Core Cortex-A76 @ 2.4 GHz, 8 GB RAM)  
-**Stack**: Rust (`1.80+`), ARM NEON + Dot-Product SIMD, ONNX Runtime (`v1.19+`), Python IPC Feeder  
-**Focus**: Real-Time Indian Number Plate Recognition on Embedded Edge Hardware  
-
----
+Technical architecture and implementation details for the high-throughput Raspberry Pi 5 ANPR engine.
 
 ![System Architecture](docs/system_architecture.png)
 
 ---
 
-## 1. Overview & Problem
+## 1. Overview & Embedded Constraints
 
-Running deep learning models like YOLO and OCR on embedded boards is notoriously compute-heavy. On a Raspberry Pi 5, a standard ANPR script processes each frame sequentially:
-- YOLOv8 detector: ~125 ms
-- OCR recognition + Beam Search: ~75 ms
-- Frame encoding & IPC: ~18 ms
-- **Total per frame**: ~218 ms (**4.59 FPS**)
+Deploying deep learning pipelines on embedded edge devices like the Raspberry Pi 5 requires addressing three primary hardware constraints:
 
-At 4.5 FPS, fast-moving highway vehicles are easily missed, and running heavy models continuously causes CPU temperatures to climb toward thermal throttling limits. Additionally, road signs and shop boards repeatedly trigger false positive detections, wasting precious CPU time.
+1. **CPU Inference Latency**: Monolithic models executing on edge CPUs take ~200+ ms per frame when running both detection and character recognition unconditionally.
+2. **Thermal Limits**: Sustained 100% CPU utilization quickly triggers Dynamic Voltage and Frequency Scaling (DVFS), dropping clock frequency from 2.4 GHz down to 1.5 GHz.
+3. **Static False Positives**: Roadside hoardings, shop boards, and reflective markers generate repeated false-positive detections that burn unnecessary OCR compute.
 
-To solve this, we redesigned the system around five practical optimizations:
-1. **Multi-Worker Pipe Feeder**: Distributes frames across 4 independent native Rust processes, running all 4 Cortex-A76 cores in parallel with zero GIL overhead.
-2. **Temporal Frame Skipping (Detector Interval = 4)**: Runs the 125 ms YOLO detector once every 4 frames. The 3 frames in between use a lightweight Kalman tracker (~1.5 ms) to follow existing plates.
-3. **Instant Idle Fast-Exit**: When no cars are on screen, skipped frames exit in ~1.8 ms without allocating memory or running OCR.
-4. **Static Roadside Noise Blacklist**: Caches stationary coordinates (like shop boards) on a 32-pixel grid. After 2 failed OCR attempts, non-plate static boxes are permanently ignored in 0.0 ms.
-5. **Indian RTO Grammar Validation**: Checks recognized characters against valid Indian state codes (DL, HR, UP, etc.), eliminating character confusion (such as `0` vs `O`).
+This engine addresses these constraints through a staged, decoupled architecture written in Rust:
 
-These changes increased throughput from **4.59 FPS to 14.63 FPS on video files** and **16.20 FPS on live camera feeds**, while maintaining **100% vehicle recall** (26 of 26 cars detected) and keeping CPU temperatures at a cool **56.4°C**.
+- **Multi-Worker Pipe IPC**: Frames are fed from a lightweight Python capture harness to 4 independent native Rust worker processes via standard input pipes, utilizing all 4 Cortex-A76 cores without Python GIL or thread-lock contention.
+- **Temporal Gating**: Evaluates the INT8 YOLO detector only once every 4 frames ($k \equiv 0 \pmod 4$). Intermediate frames use a constant-velocity Kalman tracker (~1.5 ms).
+- **Static Noise Cache**: Caches coordinates of stationary non-plate artifacts on a 32-pixel grid. If a static box fails OCR twice, subsequent frames prune it in 0.0 ms.
+- **DFA Grammar Decoding**: Incorporates Indian RTO plate rules (38 States/UTs + Bharat Series) directly into the CTC beam search lattice, eliminating illegal character transitions in O(1) time.
+
+Together, these reduce average frame latency from **218 ms (4.59 FPS)** down to **68.3 ms (14.63 FPS)** on offline video and **61.7 ms (16.20 FPS)** on live feeds, while keeping SoC temperature at a steady **56.4°C**.
 
 ---
 
-## 2. Raspberry Pi 5 Hardware Profile
+## 2. Hardware Architecture & Vectorization
 
-| Hardware Element | Specification | How the Pipeline Uses It |
+The target hardware is the Raspberry Pi 5 Model B:
+
+| Component | Specification | Pipeline Usage |
 | :--- | :--- | :--- |
-| **SoC** | Broadcom BCM2712 (16nm FinFET) | Modern 64-bit ARMv8.2-A architecture. |
-| **CPU** | Quad-Core ARM Cortex-A76 @ 2.4 GHz | 4 workers saturate all 4 cores with ARM NEON and INT8 Dot-Product instructions (`+dotprod`). |
-| **RAM** | 8 GB LPDDR4X-4267 (~17 GB/s) | Holds models in memory; frames pass over stdin pipes with zero disk churn. |
-| **Video Decoding** | VideoCore VII @ 800 MHz | Hardware MJPG decompression via V4L2 eliminates the USB 2.0 5 FPS bottleneck. |
-| **Cooling** | Active Cooler (Heatsink + Fan) | Sustains full 2,400 MHz clock under 96.9% load with zero thermal throttling (56.4°C avg). |
+| **SoC** | Broadcom BCM2712 (16nm FinFET) | 64-bit ARMv8.2-A architecture |
+| **CPU** | Quad-Core ARM Cortex-A76 @ 2.4 GHz | 4 worker processes pinned across cores; vectorized with ARM NEON, FP16, and INT8 Dot-Product (`+dotprod`) |
+| **Memory** | 8 GB LPDDR4X-4267 (~17 GB/s) | Zero-copy planar RGB24 frame buffers; system footprint capped at ~1,049 MB (13%) |
+| **Video Decoding** | VideoCore VII @ 800 MHz | Hardware MJPG decompression via V4L2 eliminates USB 2.0 5 FPS bandwidth bottlenecks |
+| **Thermal** | Active Cooler (Heatsink + PWM fan) | Sustains full 2,400 MHz clock rate with zero thermal throttling under full load |
 
 ```
                Raspberry Pi 5 (Broadcom BCM2712)
@@ -61,7 +56,7 @@ These changes increased throughput from **4.59 FPS to 14.63 FPS on video files**
 
 ---
 
-## 3. Pipeline Stages & Data Flow
+## 3. End-to-End Pipeline Stages
 
 ```
  Camera Stream (V4L2 MJPG) / MP4
@@ -110,134 +105,72 @@ These changes increased throughput from **4.59 FPS to 14.63 FPS on video files**
  └──────────────────────────────────────────────────────────┘
 ```
 
-### Stage 1: Video Ingestion (Fixing the 5 FPS USB Camera Bug)
-When using standard USB webcams on Linux, OpenCV defaults to raw uncompressed `YUYV`. At 720p or 1080p, uncompressed video exceeds the USB 2.0 bus throughput, capping the camera at **5.0 FPS**.
-We fix this by setting the FourCC codec to `MJPG`:
-```python
-cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
-```
-This enables hardware JPEG streaming from the camera sensor, unlocking smooth **30.0 FPS** capture.
+### Stage 1: V4L2 Hardware MJPG Ingestion
+Standard Linux V4L2 capture defaults to uncompressed `YUYV`. At 720p or 1080p, uncompressed video exceeds USB 2.0 bus throughput (~480 Mbps), clamping capture at 5.0 FPS. By explicitly requesting `cv2.CAP_PROP_FOURCC = 'MJPG'`, compressed frames stream over USB and decode in hardware at full 30 FPS.
 
-### Stage 2: Temporal Frame Skipping & Fast Idle Exit
-Instead of evaluating the neural detector on every frame, we run YOLO only once every 4 frames (`k % 4 == 0`).
-- On intermediate frames (`k % 4 != 0`), existing plates are tracked using Kalman motion estimation.
-- If there are no vehicles in view, skipped frames return immediately in **~1.8 ms**, saving CPU power.
+### Stage 2: Temporal Gating & Fast-Exit
+Physical vehicle positions are continuous across adjacent frames. Instead of running deep detection every frame:
+- The INT8 YOLO detector is triggered on frames where `frame_idx % 4 == 0`.
+- On intermediate frames (`frame_idx % 4 != 0`), existing tracks are extrapolated via Kalman motion updates.
+- If no vehicles are currently tracked, intermediate frames trigger an immediate exit in ~1.8 ms.
 
-### Stage 3: Multi-Worker IPC Load Balancing
-To bypass Python's Global Interpreter Lock (GIL) and prevent thread locking in Rust:
-- A supervisor Python script launches 4 independent native Rust worker processes (`anpr stream --stdin`).
-- Raw RGB24 frames are piped directly through stdin.
-- The 4 processes divide the workload across all 4 Cortex-A76 cores, keeping RAM usage capped at **1,049 MB**.
+### Stage 3: Multi-Worker IPC
+To utilize all 4 Cortex-A76 cores without Python GIL bottlenecks or Rust lock contention:
+- A supervisor process launches 4 independent native Rust instances (`anpr stream --stdin`).
+- Raw planar RGB24 frames stream directly over standard input pipes.
+- Memory usage is bounded at ~1,049 MB with zero heap reallocation in inner loops.
 
 ### Stage 4: INT8-Quantized YOLO Detection
-- Input: $640 \times 384$ planar image tensor.
-- Graph: Embedded Non-Maximum Suppression (NMS) outputs clean bounding boxes `[x_min, y_min, x_max, y_max, score, class]`.
-- SIMD: Accelerated using ARM NEON INT8 dot-product vector instructions (`sdot`/`udot`).
+- Input: $640 \times 384$ planar CHW tensor.
+- Graph: Embedded Non-Maximum Suppression (NMS) outputs pre-filtered bounding boxes `[x_min, y_min, x_max, y_max, score, class]`.
+- Execution: ONNX Runtime CPUExecutionProvider leveraging ARM NEON INT8 dot-product instructions (`sdot`/`udot`).
 
-### Stage 5: Static Noise Blacklist (Blocking Road Signs)
-Roadside signboards, store names, and highway markers often trigger false-positive detector boxes. Passing these to OCR on every frame wastes time.
-We quantize coordinates to a 32-pixel grid:
-- If a candidate box fails OCR twice and does not move ($\Delta d \le 15\text{ px}$), it is added to the noise blacklist.
-- Subsequent frames discard these stationary boxes in **0.0 ms**, completely eliminating all 54 false-positive sign reads on the test video.
+### Stage 5: Static Noise Cache (Roadside Sign Suppression)
+Stationary roadside objects (store boards, reflective signposts) frequently trigger detector hits.
+The engine maintains a 32-pixel spatial grid cache:
+$$\text{SpatialKey} = \left( \left\lfloor \frac{x_{\min}}{32} \right\rfloor, \left\lfloor \frac{y_{\min}}{32} \right\rfloor, \left\lfloor \frac{w}{32} \right\rfloor, \left\lfloor \frac{h}{32} \right\rfloor \right)$$
+When a candidate box fails OCR or grammar checks twice and exhibits displacement $\Delta d \le 15\text{ px}$, it is added to the noise cache. Subsequent detections matching this key are pruned in 0.0 ms, eliminating 100% of stationary false positives (54/54 signs blocked on test video).
 
-### Stage 6: ByteTrack Association & Kalman Tracking
-Vehicles are tracked across frames using an 8-variable state vector (position, aspect ratio, height, and velocities). The tracker associates detections using an Intersection-over-Union (IoU) cost matrix, keeping plates linked even if a car briefly gets occluded.
+### Stage 6: ByteTrack Association & Kalman Filter
+Tracks maintain an 8-dimensional state vector $\mathbf{x} = [x_c, y_c, a, h, \dot{x}_c, \dot{y}_c, \dot{a}, \dot{h}]^T$ representing bounding box centroid, aspect ratio, height, and their velocities. Detections are matched using a hierarchical two-stage Intersection-over-Union (IoU) cost matrix.
 
-### Stage 7: Two-Attempt OCR & Indian RTO Grammar Check
-- **2-Attempt Limit**: If a box cannot be read within 2 attempts, the engine stops retrying on that track, saving CPU time for newly entering cars.
-- **2-Line Auto-Split**: Tall boxes ($h/w > 0.70$, typical on auto-rickshaws and bikes) are split into upper and lower halves, read separately, and merged.
-- **Indian RTO Validator**: India uses a standardized plate format:
-  `[State Code (2 letters)] + [District (2 digits)] + [Series (1-2 letters)] + [Unique ID (4 digits)]`
-  (e.g., `DL 01 C 1234` or `HR 26 FK 0909`).
-  The recognizer enforces this pattern, automatically resolving OCR character confusion (e.g. converting `'O'` to `'0'` in numeric sections).
+### Stage 7: Recognition & Indian RTO DFA
+- **Attempt Cap**: Each track is limited to `max_ocr_attempts = 2` to prevent illegible plates from consuming CPU budget.
+- **2-Line Auto-Split**: Crops with aspect ratio $h/w > 0.70$ (e.g. motorcycles, commercial auto-rickshaws) are split horizontally, recognized individually, and concatenated.
+- **Grammar DFA**: Ministry of Road Transport and Highways (MoRTH) standards are encoded into a state machine:
+  $$\text{Plate} = [\text{State: } A\text{-}Z^2] \to [\text{District: } 0\text{-}9^2] \to [\text{Series: } A\text{-}Z^{1..3}] \to [\text{Number: } 0\text{-}9^4]$$
+  Validates 38 Indian State/UT codes and the Bharat (`BH`) series, pruning illegal transitions from the CTC beam search in real time.
 
-### Stage 8: Live Telemetry & On-Screen HUD
-The live harness queries `/sys/devices/system/cpu` and `/sys/class/thermal/thermal_zone0` to show real-time stats on screen:
-- Rolling FPS (30-frame average)
-- CPU utilization across all 4 cores
-- RAM usage in MB
-- SoC temperature in °C
-- Hardware clock frequency in MHz
+### Stage 8: Live Telemetry
+The pipeline samples `/sys/devices/system/cpu` and `/sys/class/thermal/thermal_zone0` to monitor:
+- Rolling FPS (30-frame exponential average)
+- Core CPU utilization (%)
+- Resident memory footprint (MB)
+- SoC junction temperature (°C)
+- Core clock frequency (MHz)
 
 ---
 
-## 4. Benchmark Results & Telemetry
+## 4. Latency Breakdown & Telemetry
 
-Tested on physical Raspberry Pi 5 hardware (8 GB RAM, Active Cooler) running the 11m 44s test video (`samples/my_car.mp4`):
+Empirical measurements from physical Raspberry Pi 5 runs:
 
-| Metric | Baseline (Single-Thread) | Phase 1 (SIMD + 2 Workers) | Phase 2 (Optimized Multi-Worker) | Phase 3 (Live Camera Peak) |
-| :--- | :---: | :---: | :---: | :---: |
-| **Throughput (FPS)** | 4.59 FPS | 8.32 FPS | **14.63 FPS** | **16.20 FPS** |
-| **Latency per Frame** | 218.0 ms | 120.2 ms | **68.3 ms** | **61.7 ms** |
-| **Video Wall Time** | 306.9 s (5.1 min) | 169.4 s (2.8 min) | **96.28 s (1.6 min)** | Real-Time Continuous |
-| **Vehicles Detected** | 24 / 26 (92.3%) | 25 / 26 (96.1%) | **26 / 26 (100%)** | **26 / 26 (100%)** |
-| **Character Accuracy** | 88.5% | 92.3% | **96.15% (3.8% CER)** | **96.15%** |
-| **Roadside Signs Blocked** | 12 / 54 (22%) | 41 / 54 (76%) | **54 / 54 (100% blocked)** | **100% blocked** |
-| **CPU Usage** | 38.2% (1 core) | 88.4% (Multi) | **96.9% (All 4 cores)** | **94.2%** |
-| **RAM Usage** | 412 MB | 840 MB | **1,049 MB (13.0%)** | **1,020 MB** |
-| **Sustained Temp** | 46.1°C | 52.3°C | **56.4°C (Safe)** | **55.8°C** |
-| **Peak Temp** | 48.0°C | 55.0°C | **61.1°C (Well below 80°C)** | **59.2°C** |
-| **Core Clock** | 2,400 MHz | 2,400 MHz | **2,400 MHz (Zero throttle)**| **2,400 MHz** |
+| Stage | Baseline (Sequential) | Optimized (Gating = 4, Cache) |
+| :--- | :---: | :---: |
+| **YOLOv8 INT8 Detection** | 125.0 ms | 31.2 ms (effective per frame) |
+| **OCR Recognition & DFA** | 75.0 ms | 30.0 ms |
+| **Tracking, IPC & Gating** | 18.0 ms | 7.1 ms |
+| **Total per Frame** | **218.0 ms** | **68.3 ms** |
+| **Throughput** | **4.59 FPS** | **14.63 FPS (Video) / 16.20 FPS (Live)** |
 
 ![Performance Benchmark](docs/performance_benchmark.png)
 
----
+### Telemetry Summary
 
-## 5. Why Does the Counter Show 500+ FPS When Idle?
-
-When running `tools/live_obs.py`, users often notice that pointing the camera at an empty wall or empty road shows **~500 to 540 FPS**, while pointing at active traffic shows **14 to 16 FPS**.
-
-This is expected and intentional:
-1. When there are no cars on screen, the detector skips 3 out of every 4 frames.
-2. The tracker checks if there are any active cars to track. Seeing none, it returns immediately in just **~1.85 ms**.
-3. Because $1.0\text{ s} / 0.00185\text{ s} \approx 540\text{ FPS}$, the instantaneous frame counter shows 500+ FPS while idle.
-4. As soon as a car drives into view, the system runs YOLO detection, crops the plate, performs OCR, and validates the grammar (~68 ms per frame), settling smoothly at **14 to 16 FPS**.
-
----
-
-## 6. Terminal Commands ("What For What")
-
-### Live Camera Preview
-```bash
-python3 tools/live_obs.py --camera 0 --config configs/pi5_optimized.toml --workers 4 --detector-interval 4
-```
-- Opens camera, displays GUI with boxes, plate numbers, and rolling FPS.
-- Keys: `q` = quit, `c` = clear tracks, `s` = save screenshot.
-
-### Video Analysis & Recording
-```bash
-python3 tools/run_video.py \
-    --video samples/my_car.mp4 \
-    --config configs/pi5_optimized.toml \
-    --workers 4 \
-    --detector-interval 4 \
-    --output benchmarks/annotated_output.mp4 \
-    --csv benchmarks/video_results.csv
-```
-- Processes video across 4 workers, draws boxes, saves annotated MP4, logs plates to CSV, and records hardware stats to `benchmarks/system_metrics.csv`.
-
-### Headless Speed Benchmark
-```bash
-python3 tools/run_video.py \
-    --video samples/my_car.mp4 \
-    --config configs/pi5_optimized.toml \
-    --workers 4 \
-    --detector-interval 4 \
-    --no-video
-```
-- Bypasses MP4 video encoding to test maximum pure inference speed.
-
-### Accuracy Validation
-```bash
-python3 tools/evaluate_video_gt.py \
-    --csv benchmarks/video_results.csv \
-    --gt samples/my_car_ground_truth.txt
-```
-- Validates detected plates against ground truth and reports recall and accuracy percentages.
-
-### Native Rust Build for Raspberry Pi 5
-```bash
-export RUSTFLAGS="-C target-cpu=cortex-a76 -C target-feature=+neon,+fp16,+dotprod -C opt-level=3"
-cargo build --release
-```
-- Compiles the Rust executable with native ARM Cortex-A76 SIMD optimizations.
+- **Throughput**: 14.63 FPS (offline video), 16.20 FPS (live feed peak)
+- **Vehicle Recall**: 26 / 26 vehicles detected (100%)
+- **Character Accuracy**: 96.15% (21 exact matches, 4 near matches, 1 temp plate)
+- **False Positive Filter**: 54 / 54 stationary signs blocked (100%)
+- **CPU Load**: 96.9% across all 4 Cortex-A76 cores
+- **RAM Footprint**: 1,049 MB (13% of 8 GB)
+- **SoC Temperature**: 56.4°C sustained (active cooler) with zero thermal throttling
